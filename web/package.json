@@ -25,22 +25,22 @@
   },
   "license": "MIT",
   "name": "theses-listing-web",
+  "optionalDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "1.2.15",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.3.3",
+    "lightningcss-linux-x64-gnu": "1.33.0"
+  },
   "private": true,
   "scripts": {
-    "prebuild": "node ../scripts/build-revision.mjs",
     "build": "tsc -b && vite build",
     "check": "tsc --noEmit",
     "dev": "vite",
     "format": "eslint --fix .",
     "lint": "eslint --fix .",
+    "prebuild": "node ../scripts/build-revision.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },
   "type": "module",
-  "version": "0.0.0",
-  "optionalDependencies": {
-    "@rolldown/binding-linux-x64-gnu": "1.2.15",
-    "@tailwindcss/oxide-linux-x64-gnu": "4.3.3",
-    "lightningcss-linux-x64-gnu": "1.33.0"
-  }
+  "version": "0.0.0"
 }
