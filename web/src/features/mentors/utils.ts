@@ -34,7 +34,7 @@ export const getSubmissionYear = (value: string): null | string => {
   if (parts.length !== 3) return null;
 
   const year = parts[2]?.trim();
-  return !year || !SUBMISSION_YEAR_REGEX.test(year) ? null : year;
+  return year && SUBMISSION_YEAR_REGEX.test(year) ? year : null;
 };
 
 export const createFileUrlGetter =
