@@ -9,24 +9,12 @@ export type SearchIntent = {
   readonly sort: string;
 };
 
-type PendingTimer = {
-  readonly intent: SearchIntent;
-  readonly kind: 'refresh' | 'search';
-  readonly timer: ReturnType<typeof setTimeout>;
-};
-
 type SearchAnalyticsOptions = {
   readonly active: Accessor<boolean>;
   readonly count: Accessor<number>;
   readonly intent: Accessor<SearchIntent>;
   readonly ready: Accessor<boolean>;
   readonly section: 'diplomas' | 'masters';
-};
-
-type SettledSearch = {
-  readonly count: number;
-  readonly id: string;
-  readonly intent: SearchIntent;
 };
 
 type Trigger =
@@ -49,6 +37,18 @@ const getTrigger = (
 };
 
 export const createSearchAnalytics = (options: SearchAnalyticsOptions) => {
+  type PendingTimer = {
+    readonly intent: SearchIntent;
+    readonly kind: 'refresh' | 'search';
+    readonly timer: ReturnType<typeof setTimeout>;
+  };
+
+  type SettledSearch = {
+    readonly count: number;
+    readonly id: string;
+    readonly intent: SearchIntent;
+  };
+
   let settled: SettledSearch | undefined;
   let initialIntent: SearchIntent | undefined;
   let pendingTimer: PendingTimer | undefined;

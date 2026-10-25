@@ -166,12 +166,13 @@ export const createAuthMiddleware =
   ): MiddlewareHandler<CatalogWorkerEnv> =>
   async (c, nextFn) => {
     if (!c.env.CAS_USERNAME || !c.env.CAS_PASSWORD) {
-      return c.json({ error: 'CAS credentials are not configured' }, 500);
+      c.res = c.json({ error: 'CAS credentials are not configured' }, 500);
+      return;
     }
 
     c.set('auth', resolveAuth(c.env.CAS_USERNAME, c.env.CAS_PASSWORD));
 
-    return nextFn();
+    await nextFn();
   };
 
 export const createCachedJsonResponse = (

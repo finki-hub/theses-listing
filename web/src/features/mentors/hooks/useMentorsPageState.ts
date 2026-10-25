@@ -188,11 +188,10 @@ export const useMentorsPageState = (
 
   createEffect(() => {
     const currentExpandedMentor = expandedMentor();
-    if (!currentExpandedMentor) return;
-
     // Don't collapse the expanded mentor before data has loaded,
     // otherwise URL params get wiped on initial page load.
-    if (diplomas.loading || loadError() !== null) return;
+    if (!currentExpandedMentor || diplomas.loading || loadError() !== null)
+      return;
 
     const mentorStillVisible = filteredSummaries().some(
       (summary) => summary.mentor === currentExpandedMentor,

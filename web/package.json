@@ -3,9 +3,9 @@
     "@kobalte/core": "^0.13.14",
     "@solidjs/router": "^1.0.0",
     "clsx": "^2.1.1",
-    "lucide-solid": "^1.60.0",
-    "posthog-js": "^1.438.12",
-    "simple-icons": "^16.35.0",
+    "lucide-solid": "^1.61.0",
+    "posthog-js": "^1.438.21",
+    "simple-icons": "^16.36.0",
     "solid-js": "^1.9.17",
     "solid-sonner": "^0.3.2",
     "tailwind-merge": "^3.7.0",
@@ -15,32 +15,32 @@
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.6.5",
     "eslint": "^10.13.0",
-    "eslint-config-imperium": "^4.1.5",
+    "eslint-config-imperium": "^5.0.0",
     "tailwindcss": "^4.3.3",
     "tw-animate-css": "^1.4.0",
     "typescript": "~6.0.3",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vite-plugin-solid": "^2.11.14",
     "vitest": "^5.0.5"
   },
   "license": "MIT",
   "name": "theses-listing-web",
+  "optionalDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "1.2.15",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.3.3",
+    "lightningcss-linux-x64-gnu": "1.33.0"
+  },
   "private": true,
   "scripts": {
-    "prebuild": "node ../scripts/build-revision.mjs",
     "build": "tsc -b && vite build",
     "check": "tsc --noEmit",
     "dev": "vite",
     "format": "eslint --fix .",
     "lint": "eslint --fix .",
+    "prebuild": "node ../scripts/build-revision.mjs",
     "preview": "vite preview",
     "test": "vitest run"
   },
   "type": "module",
-  "version": "0.0.0",
-  "optionalDependencies": {
-    "@rolldown/binding-linux-x64-gnu": "1.2.14",
-    "@tailwindcss/oxide-linux-x64-gnu": "4.3.3",
-    "lightningcss-linux-x64-gnu": "1.33.0"
-  }
+  "version": "0.0.0"
 }

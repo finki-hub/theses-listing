@@ -2,14 +2,14 @@
   "dependencies": {
     "@hono/zod-validator": "^0.9.1",
     "finki-auth": "^3.0.0",
-    "hono": "^4.13.13",
+    "hono": "^4.13.14",
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20261019.1",
+    "@cloudflare/workers-types": "^5.20261025.1",
     "@types/node": "^26.6.5",
     "eslint": "^10.13.0",
-    "eslint-config-imperium": "^4.1.5",
+    "eslint-config-imperium": "^5.0.0",
     "typescript": "~6.0.3"
   },
   "license": "MIT",
