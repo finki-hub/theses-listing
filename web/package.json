@@ -21,7 +21,7 @@
     "typescript": "~6.0.3",
     "vite": "^8.3.5",
     "vite-plugin-solid": "^2.11.15",
-    "vitest": "^5.0.5"
+    "vitest": "^5.1.0"
   },
   "license": "MIT",
   "name": "theses-listing-web",
