@@ -27,7 +27,7 @@
   "name": "theses-listing-web",
   "optionalDependencies": {
     "@rolldown/binding-linux-x64-gnu": "1.3.0",
-    "@tailwindcss/oxide-linux-x64-gnu": "4.3.3",
+    "@tailwindcss/oxide-linux-x64-gnu": "4.3.5",
     "lightningcss-linux-x64-gnu": "1.33.0"
   },
   "private": true,
