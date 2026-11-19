@@ -2,6 +2,7 @@ import { useLocation } from '@solidjs/router';
 import { RefreshCw } from 'lucide-solid';
 import { createEffect, Show } from 'solid-js';
 
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -86,22 +87,23 @@ export default function MentorsPage(props: MentorsPageProps) {
 
             <Show when={state.loadError() !== null}>
               <div
-                class="flex flex-col items-start gap-3 rounded-lg border border-destructive bg-destructive/10 p-4 text-sm text-destructive sm:flex-row sm:items-center sm:justify-between"
+                class="mb-4 flex flex-col items-start gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive sm:flex-row sm:items-center sm:justify-between"
                 role="alert"
               >
                 <span>{t().loadError}</span>
-                <button
-                  class="inline-flex h-9 shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md border border-destructive/30 bg-background px-3 font-medium text-foreground ring-offset-background transition-colors hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                <Button
+                  class="border-destructive/30 text-foreground"
                   disabled={state.diplomas.loading}
                   onClick={() => state.refetchDiplomas()}
-                  type="button"
+                  size="sm"
+                  variant="outline"
                 >
                   <RefreshCw
                     aria-hidden="true"
                     class="h-4 w-4"
                   />
                   {t().retry}
-                </button>
+                </Button>
               </div>
             </Show>
 

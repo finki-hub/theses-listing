@@ -2,6 +2,7 @@ import { siGithub } from 'simple-icons';
 
 import { LanguageSelect } from '@/components/LanguageSelect';
 import ThemeToggle from '@/components/ThemeToggle';
+import { buttonVariants } from '@/components/ui/button';
 import { useLanguage } from '@/lib/LanguageProvider';
 
 const GitHubIcon = () => (
@@ -32,7 +33,7 @@ export default function MentorsPageHeader() {
         <div class="col-span-2 ml-auto flex shrink-0 items-center gap-2">
           <a
             aria-label={t().github}
-            class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-input bg-background text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            class={buttonVariants({ size: 'icon', variant: 'outline' })}
             href="https://github.com/finki-hub/theses-listing"
             rel="noopener noreferrer"
             target="_blank"

@@ -2,6 +2,7 @@
 /** @refresh reload */
 /* eslint-enable jsdoc/check-tag-names -- Re-enable after the Solid Refresh marker. */
 import { render } from 'solid-js/web';
+import '@fontsource-variable/inter';
 
 import './app.css';
 import { initAnalytics } from '@/lib/analytics.ts';
