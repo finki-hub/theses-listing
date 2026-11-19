@@ -29,6 +29,7 @@ export const sq = {
   retry: 'Provo përsëri',
   search: 'Kërko',
   searchPlaceholder: 'Kërko sipas mentorit, titullit, studentit ose statusit…',
+  sectionNavigation: 'Lloji i punimit',
   sections: {
     diplomas: {
       cardDescription:

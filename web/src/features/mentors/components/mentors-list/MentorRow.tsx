@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-solid';
-import { Show } from 'solid-js';
+import { createUniqueId, Show } from 'solid-js';
 
 import { TableCell, TableRow } from '@/components/ui/table';
 import { formatNumber } from '@/lib/format';
@@ -13,28 +13,27 @@ import DiplomaDetailsTable from './DiplomaDetailsTable';
 
 const MentorRow = (props: MentorListItemProps) => {
   const { language } = useLanguage();
+  const detailsId = createUniqueId();
   return (
     <>
+      {/* The whole row is a mouse target. Keyboard and assistive technology
+          use the disclosure button, whose click bubbles up to this handler. */}
       <TableRow
         class="cursor-pointer"
         onClick={props.onToggle}
-        onKeyDown={(event) => {
-          if (!(event.key === 'Enter' || event.key === ' ')) {
-            return;
-          }
-
-          event.preventDefault();
-          props.onToggle();
-        }}
-        role="button"
-        tabIndex={0}
       >
         <TableCell class="text-center text-muted-foreground">
           {formatNumber(props.index + 1, language())}
         </TableCell>
         <TableCell class="font-medium">
-          <div class="flex items-center gap-2">
+          <button
+            aria-controls={props.expanded ? detailsId : undefined}
+            aria-expanded={props.expanded}
+            class="flex max-w-full cursor-pointer items-center gap-2 rounded-sm text-left ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            type="button"
+          >
             <ChevronRight
+              aria-hidden="true"
               class={`h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 ${
                 props.expanded ? 'rotate-90' : ''
               }`}
@@ -42,7 +41,7 @@ const MentorRow = (props: MentorListItemProps) => {
             <span class="truncate">
               {displayName(props.summary.mentor, language())}
             </span>
-          </div>
+          </button>
         </TableCell>
         <TableCell class="text-right">
           <DiplomaCountBadge
@@ -58,6 +57,7 @@ const MentorRow = (props: MentorListItemProps) => {
           <TableCell
             class="p-0 whitespace-normal"
             colSpan={3}
+            id={detailsId}
           >
             <DiplomaDetailsTable
               diplomas={props.summary.filteredDiplomas}

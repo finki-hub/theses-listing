@@ -131,11 +131,36 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
       <table class="hidden w-full text-sm sm:table">
         <thead>
           <tr class="border-b text-muted-foreground">
-            <th class="pb-2 pr-4 text-left font-medium">{t().student}</th>
-            <th class="pb-2 pr-4 text-left font-medium">{t().title}</th>
-            <th class="pb-2 pr-4 text-left font-medium">{t().status}</th>
-            <th class="pb-2 pr-4 text-left font-medium">{t().date}</th>
-            <th class="pb-2 text-left font-medium">{t().file}</th>
+            <th
+              class="pb-2 pr-4 text-left font-medium"
+              scope="col"
+            >
+              {t().student}
+            </th>
+            <th
+              class="pb-2 pr-4 text-left font-medium"
+              scope="col"
+            >
+              {t().title}
+            </th>
+            <th
+              class="pb-2 pr-4 text-left font-medium"
+              scope="col"
+            >
+              {t().status}
+            </th>
+            <th
+              class="pb-2 pr-4 text-left font-medium"
+              scope="col"
+            >
+              {t().date}
+            </th>
+            <th
+              class="pb-2 text-left font-medium"
+              scope="col"
+            >
+              {t().file}
+            </th>
           </tr>
         </thead>
         <tbody>

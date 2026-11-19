@@ -15,7 +15,8 @@ type SortButtonProps = {
 
 const SortButton = (props: SortButtonProps) => (
   <button
-    class={`inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors ${
+    aria-pressed={props.sortField === props.field}
+    class={`inline-flex cursor-pointer items-center rounded-full border px-3 py-1.5 text-sm transition-colors ${
       props.sortField === props.field
         ? 'border-primary/40 bg-primary/10 text-foreground'
         : 'border-border bg-background text-muted-foreground hover:text-foreground'

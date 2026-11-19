@@ -29,6 +29,7 @@ export const tr = {
   retry: 'Tekrar dene',
   search: 'Ara',
   searchPlaceholder: 'Danışman, başlık, öğrenci veya duruma göre ara…',
+  sectionNavigation: 'Tez türü',
   sections: {
     diplomas: {
       cardDescription:

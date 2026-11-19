@@ -5,9 +5,15 @@ import { useLanguage } from '@/lib/LanguageProvider';
 export default function LoadingSpinner() {
   const { t } = useLanguage();
   return (
-    <div class="flex items-center justify-center py-12">
+    <div
+      class="flex items-center justify-center py-12"
+      role="status"
+    >
       <div class="flex flex-col items-center gap-3">
-        <LoaderCircle class="h-8 w-8 animate-spin text-muted-foreground" />
+        <LoaderCircle
+          aria-hidden="true"
+          class="h-8 w-8 animate-spin text-muted-foreground"
+        />
         <p class="text-sm text-muted-foreground">{t().loading}</p>
       </div>
     </div>
