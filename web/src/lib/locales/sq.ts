@@ -61,6 +61,7 @@ export const sq = {
   staleUpdated:
     'Të dhënat mund të jenë të vjetruara · Përditësimi i fundit i suksesshëm: {date}',
   status: 'Statusi',
+  statusStep: 'Hapi {step} nga {total}',
   student: 'Studenti',
   themeDark: 'E errët',
   themeLight: 'E çelët',

@@ -45,6 +45,7 @@ const createTestState = (
     getFileUrl: () => null,
     getStatusStage: () => null,
     id: 'diplomas',
+    isComplete: () => false,
     maxStatusStage: 9,
   };
   let dispose: (() => void) | undefined;

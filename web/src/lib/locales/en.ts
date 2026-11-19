@@ -58,6 +58,7 @@ export const en = {
   sortMentor: 'By mentor',
   staleUpdated: 'Data may be outdated · Last successful refresh: {date}',
   status: 'Status',
+  statusStep: 'Step {step} of {total}',
   student: 'Student',
   themeDark: 'Dark',
   themeLight: 'Light',

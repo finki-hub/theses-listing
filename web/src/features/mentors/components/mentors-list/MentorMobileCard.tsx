@@ -48,9 +48,10 @@ const MentorMobileCard = (props: MentorListItemProps) => {
               </div>
             </div>
             <DiplomaCountBadge
+              compact
               filteredCount={props.summary.filteredDiplomas.length}
               hasActiveFilters={props.hasActiveFilters}
-              opacity={props.getBadgeOpacity(props.summary.totalDiplomas)}
+              share={props.getCountShare(props.summary.totalDiplomas)}
               totalCount={props.summary.totalDiplomas}
             />
           </div>
@@ -69,7 +70,7 @@ const MentorMobileCard = (props: MentorListItemProps) => {
             diplomas={props.summary.filteredDiplomas}
             getFileUrl={props.getFileUrl}
             getSearchAttemptId={props.getSearchAttemptId}
-            getStatusOpacity={props.getStatusOpacity}
+            getStatusInfo={props.getStatusInfo}
             section={props.section}
           />
         </div>

@@ -33,10 +33,10 @@ const MentorsList = (props: MentorsListProps) => {
             {(summary, index) => (
               <MentorMobileCard
                 expanded={props.expandedMentor === summary.mentor}
-                getBadgeOpacity={props.getBadgeOpacity}
+                getCountShare={props.getCountShare}
                 getFileUrl={props.getFileUrl}
                 getSearchAttemptId={props.getSearchAttemptId}
-                getStatusOpacity={props.getStatusOpacity}
+                getStatusInfo={props.getStatusInfo}
                 hasActiveFilters={props.hasActiveFilters}
                 index={index()}
                 onToggle={() => {
@@ -76,10 +76,10 @@ const MentorsList = (props: MentorsListProps) => {
                 {(summary, index) => (
                   <MentorRow
                     expanded={props.expandedMentor === summary.mentor}
-                    getBadgeOpacity={props.getBadgeOpacity}
+                    getCountShare={props.getCountShare}
                     getFileUrl={props.getFileUrl}
                     getSearchAttemptId={props.getSearchAttemptId}
-                    getStatusOpacity={props.getStatusOpacity}
+                    getStatusInfo={props.getStatusInfo}
                     hasActiveFilters={props.hasActiveFilters}
                     index={index()}
                     onToggle={() => {

@@ -63,6 +63,7 @@ export const mk = {
   staleUpdated:
     'Податоците можеби не се најнови · Последно успешно освежување: {date}',
   status: 'Статус',
+  statusStep: 'Чекор {step} од {total}',
   student: 'Студент',
   themeDark: 'Темна',
   themeLight: 'Светла',

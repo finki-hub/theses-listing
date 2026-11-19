@@ -23,7 +23,7 @@ import {
   syncMentorsSearchParams,
 } from '../query-state';
 import {
-  getStatusOpacity as getSectionStatusOpacity,
+  getStatusInfo as getSectionStatusInfo,
   type SectionConfig,
 } from '../section';
 import {
@@ -227,15 +227,10 @@ export const useMentorsPageState = (
     section: config.id,
   });
 
-  const getBadgeOpacity = (count: number) => {
-    const min = 0.3;
-    const max = 1;
+  const getCountShare = (count: number) => count / maxDiplomas();
 
-    return min + (count / maxDiplomas()) * (max - min);
-  };
-
-  const getStatusOpacity = (status: string) =>
-    getSectionStatusOpacity(config, status);
+  const getStatusInfo = (status: string) =>
+    getSectionStatusInfo(config, status);
 
   const handleSort = (field: SortField) => {
     if (sortField() === field) {
@@ -265,9 +260,9 @@ export const useMentorsPageState = (
     expandedMentor,
     filteredDiplomasCount,
     filteredSummaries,
-    getBadgeOpacity,
+    getCountShare,
     getSearchAttemptId: searchAnalytics.getSearchAttemptId,
-    getStatusOpacity,
+    getStatusInfo,
     handleSort,
     hasActiveFilters,
     isStale,

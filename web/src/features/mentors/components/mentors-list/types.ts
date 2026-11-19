@@ -1,5 +1,6 @@
 import type { Diploma } from '@/types';
 
+import type { StatusInfo } from '../../section';
 import type {
   FilteredMentorSummary,
   SortDirection,
@@ -9,7 +10,8 @@ import type {
 export type DiplomaCountBadgeProps = {
   filteredCount: number;
   hasActiveFilters: boolean;
-  opacity: number;
+  // Total count relative to the busiest mentor, from 0 to 1.
+  share: number;
   totalCount: number;
 };
 
@@ -17,16 +19,16 @@ export type DiplomaDetailsTableProps = {
   diplomas: Diploma[];
   getFileUrl: (fileId: null | string) => null | string;
   getSearchAttemptId: () => string | undefined;
-  getStatusOpacity: (status: string) => number;
+  getStatusInfo: (status: string) => StatusInfo;
   section: 'diplomas' | 'masters';
 };
 
 export type MentorListItemProps = {
   expanded: boolean;
-  getBadgeOpacity: (count: number) => number;
+  getCountShare: (count: number) => number;
   getFileUrl: (fileId: null | string) => null | string;
   getSearchAttemptId: () => string | undefined;
-  getStatusOpacity: (status: string) => number;
+  getStatusInfo: (status: string) => StatusInfo;
   hasActiveFilters: boolean;
   index: number;
   onToggle: () => void;
@@ -37,10 +39,10 @@ export type MentorListItemProps = {
 export type MentorsListProps = {
   expandedMentor: null | string;
   filteredSummaries: FilteredMentorSummary[];
-  getBadgeOpacity: (count: number) => number;
+  getCountShare: (count: number) => number;
   getFileUrl: (fileId: null | string) => null | string;
   getSearchAttemptId: () => string | undefined;
-  getStatusOpacity: (status: string) => number;
+  getStatusInfo: (status: string) => StatusInfo;
   hasActiveFilters: boolean;
   onSort: (field: SortField) => void;
   onToggle: (mentor: string) => void;
