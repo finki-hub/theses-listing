@@ -16,7 +16,7 @@ type SortButtonProps = {
 const SortButton = (props: SortButtonProps) => (
   <button
     aria-pressed={props.sortField === props.field}
-    class={`inline-flex cursor-pointer items-center rounded-full border px-3 py-1.5 text-sm transition-colors ${
+    class={`inline-flex h-8 cursor-pointer items-center rounded-full border px-3 text-sm transition-colors ${
       props.sortField === props.field
         ? 'border-primary/40 bg-primary/10 text-foreground'
         : 'border-border bg-background text-muted-foreground hover:text-foreground'
@@ -39,9 +39,7 @@ const MobileSortControls = (props: SortControlsProps) => {
   const { t } = useLanguage();
   return (
     <div class="mb-4 space-y-2">
-      <div class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
-        {t().sorting}
-      </div>
+      <div class="text-sm font-medium text-foreground">{t().sorting}</div>
       <div class="flex flex-wrap gap-2">
         <SortButton
           field="totalDiplomas"

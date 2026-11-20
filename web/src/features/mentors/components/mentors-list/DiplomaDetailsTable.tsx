@@ -83,12 +83,6 @@ const MobileDiplomaCard = (props: {
           text={displayName(props.diploma.student, language())}
         />
       </div>
-      <div class="-mt-1">
-        <ThesisExtras
-          diploma={props.diploma}
-          section={props.section}
-        />
-      </div>
       <div class="flex items-start gap-2">
         <div class="min-w-0 flex-1">
           <StatusBadge
@@ -105,6 +99,14 @@ const MobileDiplomaCard = (props: {
           getSearchAttemptId={props.getSearchAttemptId}
           section={props.section}
           url={url()}
+        />
+      </div>
+      {/* Below the status row, so an open abstract doesn't push the status
+          and date far away from the title on phones. */}
+      <div class="-mt-1">
+        <ThesisExtras
+          diploma={props.diploma}
+          section={props.section}
         />
       </div>
     </li>

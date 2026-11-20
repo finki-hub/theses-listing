@@ -75,7 +75,7 @@ export const tr = {
   statusCancelled: 'İptal edildi',
   statusComplete: 'Tamamlandı',
   statusDetailed: 'Ayrıntılı durum',
-  statusInProgress: 'Devam ediyor',
+  statusInProgress: 'Sürüyor',
   statusState: 'Durum',
   statusStep: 'Adım {step} / {total}',
   student: 'Öğrenci',

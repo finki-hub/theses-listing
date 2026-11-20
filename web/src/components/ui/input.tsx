@@ -25,7 +25,7 @@ export const NativeSelect = (props: NativeSelectProps) => {
 
   return (
     <select
-      class={cn(controlClass, 'cursor-pointer pr-8', local.class)}
+      class={cn(controlClass, 'cursor-pointer pr-2', local.class)}
       {...rest}
     />
   );
