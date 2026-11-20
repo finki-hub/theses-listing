@@ -5,6 +5,7 @@ export const tr = {
   allYears: 'Tüm yıllar',
   appTitle: 'FINKI Hub / Tezler',
   average: 'Danışman başına ortalama',
+  backToTop: 'Başa dön',
   brand: 'FINKI Hub',
   clearFilters: 'Filtreleri temizle',
   clearSearch: 'Aramayı temizle',

@@ -2,13 +2,17 @@ import { type ComponentProps, splitProps } from 'solid-js';
 
 import { cn } from '@/lib/cn';
 
-export type TableProps = ComponentProps<'table'>;
+export type TableProps = ComponentProps<'table'> & {
+  // Without the horizontal scroll wrapper, so a sticky header can stick to
+  // the viewport. Only for tables that never need to scroll sideways.
+  readonly unscrolled?: boolean;
+};
 
 export const Table = (props: TableProps) => {
-  const [, rest] = splitProps(props, ['class']);
+  const [, rest] = splitProps(props, ['class', 'unscrolled']);
 
   return (
-    <div class="relative w-full overflow-x-auto">
+    <div class={cn('relative w-full', !props.unscrolled && 'overflow-x-auto')}>
       <table
         class={cn('w-full caption-bottom text-sm', props.class)}
         {...rest}

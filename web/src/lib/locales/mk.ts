@@ -5,6 +5,7 @@ export const mk = {
   allYears: 'Сите години',
   appTitle: 'ФИНКИ Хаб / Трудови',
   average: 'Просек по ментор',
+  backToTop: 'Назад на врвот',
   brand: 'ФИНКИ Хаб',
   clearFilters: 'Исчисти филтри',
   clearSearch: 'Исчисти пребарување',

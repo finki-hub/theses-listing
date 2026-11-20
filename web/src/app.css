@@ -112,6 +112,11 @@
 }
 
 @layer base {
+  html {
+    /* Keeps keyboard focus from scrolling under the sticky table header. */
+    scroll-padding-top: 3rem;
+  }
+
   * {
     @apply border-border;
     scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;

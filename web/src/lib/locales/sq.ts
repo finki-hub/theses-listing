@@ -5,6 +5,7 @@ export const sq = {
   allYears: 'Të gjitha vitet',
   appTitle: 'FINKI Hub / Punime diplome',
   average: 'Mesatarja për mentor',
+  backToTop: 'Kthehu në krye',
   brand: 'FINKI Hub',
   clearFilters: 'Pastro filtrat',
   clearSearch: 'Pastro kërkimin',

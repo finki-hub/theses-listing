@@ -2,6 +2,7 @@ import { useLocation } from '@solidjs/router';
 import { RefreshCw, TriangleAlert } from 'lucide-solid';
 import { createEffect, Show } from 'solid-js';
 
+import BackToTop from '@/components/BackToTop';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -41,7 +42,8 @@ export default function MentorsPage(props: MentorsPageProps) {
     <div class="min-h-screen bg-background">
       <MentorsPageHeader />
 
-      <main class="container mx-auto py-6 sm:py-8">
+      {/* Extra bottom room so the back-to-top button never covers the last row. */}
+      <main class="container mx-auto pt-6 pb-20 sm:pt-8 sm:pb-24">
         <div class="mb-6">
           <SectionSwitch
             active={props.config.id}
@@ -65,7 +67,9 @@ export default function MentorsPage(props: MentorsPageProps) {
           </p>
         </Show>
 
-        <Card class="overflow-hidden">
+        {/* clip, not hidden: hidden makes a scroll container, which would
+            stop the table header from sticking to the viewport. */}
+        <Card class="overflow-clip">
           <CardHeader class="px-4 sm:px-6">
             <CardTitle>{strings().cardTitle}</CardTitle>
             <CardDescription>{strings().cardDescription}</CardDescription>
@@ -170,6 +174,8 @@ export default function MentorsPage(props: MentorsPageProps) {
           </CardContent>
         </Card>
       </main>
+
+      <BackToTop />
     </div>
   );
 }
