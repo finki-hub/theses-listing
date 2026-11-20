@@ -95,6 +95,7 @@ export const sq = {
   totalMentors: 'Gjithsej mentorë',
   year: 'Viti',
   yearChartHint: 'Zgjidhni një vit për të filtruar listën.',
+  yearRecent: '30 ditët e fundit',
   yearSoFar: '{year} (deri tani)',
   yearUndated: 'Pa datë: {count}',
 } as const satisfies Translations;

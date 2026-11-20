@@ -13,6 +13,7 @@ const CANCELLED_URL = /status=tone%3Acancelled/u;
 const MASTERS_URL = /\/masters\?q=medical/u;
 const YEAR_URL = /year=2019/u;
 const IN_PROGRESS_URL = /sort=inProgress/u;
+const RECENT_URL = /year=recent/u;
 const MENTOR_NAME = /Ana Petrovska|Marko Nikolov/u;
 
 // Names are matched as substrings, so rank prefixes and counts don't matter.
@@ -196,4 +197,21 @@ test('sorts by current workload and shows committee work', async ({
 
   await mentorButton(page, ANA).click();
   await expect(page.getByText('On committees: 1')).toBeVisible();
+});
+
+test('shows only theses from the last 30 days', async ({ page }) => {
+  // Only the trip planner (02.10.2026) is within 30 days of this date.
+  await page.clock.setFixedTime('2026-10-20T12:00:00');
+  await mockCatalogs(page);
+  await page.goto('/');
+
+  await page.getByRole('combobox', { name: 'Year' }).selectOption('recent');
+
+  await expect(page).toHaveURL(RECENT_URL);
+  await expect(mentorButton(page, MARKO)).toHaveCount(0);
+  await mentorButton(page, ANA).click();
+  await expect(page.getByText('Trip planner for mobile devices')).toBeVisible();
+  await expect(
+    page.getByText('Path planning for warehouse robots'),
+  ).toHaveCount(0);
 });

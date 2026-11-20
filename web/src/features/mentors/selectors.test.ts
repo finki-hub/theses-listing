@@ -7,9 +7,14 @@ import {
   buildFilteredSummaries,
   countByTone,
   parseToneFilter,
+  RECENT_FILTER,
   toneFilterValue,
 } from './selectors';
-import { aggregateByMentor, countCommitteeSeats } from './utils';
+import {
+  aggregateByMentor,
+  countCommitteeSeats,
+  getSubmissionDay,
+} from './utils';
 
 const thesis: Diploma = {
   dateOfSubmission: '03.07.2026',
@@ -136,5 +141,61 @@ describe('countCommitteeSeats', () => {
     expect(counts.get('Борис Борисов')).toBe(2);
     expect(counts.get('Ана Анева')).toBe(1);
     expect(counts.has('')).toBe(false);
+  });
+});
+
+describe('getSubmissionDay', () => {
+  it('turns dates into comparable day numbers', () => {
+    expect(getSubmissionDay('01.01.1970')).toBe(0);
+    expect(getSubmissionDay('01.03.2024')).toBe(
+      (getSubmissionDay('28.02.2024') ?? 0) + 2,
+    );
+    expect(getSubmissionDay('03.07.2026 11:00')).toBe(
+      getSubmissionDay('03.07.2026'),
+    );
+    expect(getSubmissionDay('')).toBeNull();
+    expect(getSubmissionDay('2026')).toBeNull();
+  });
+});
+
+describe('recent and year filters', () => {
+  const today = getSubmissionDay('20.11.2026') ?? 0;
+  const theses: Diploma[] = [
+    { ...thesis, dateOfSubmission: '19.11.2026', mentor: 'Recent' },
+    { ...thesis, dateOfSubmission: '22.10.2026', mentor: 'Recent' },
+    { ...thesis, dateOfSubmission: '20.10.2026', mentor: 'Recent' },
+    { ...thesis, dateOfSubmission: '01.01.2025', mentor: 'Old' },
+    { ...thesis, dateOfSubmission: '02.01.2025', mentor: 'Old' },
+    { ...thesis, dateOfSubmission: '03.01.2025', mentor: 'Old' },
+    { ...thesis, dateOfSubmission: '04.01.2026', mentor: 'Old' },
+  ];
+  const filter = (selectedYear: string) =>
+    buildFilteredSummaries({
+      query: '',
+      selectedStatus: '',
+      selectedYear,
+      sortDirection: 'desc',
+      sortField: 'totalDiplomas',
+      summaries: aggregateByMentor(theses),
+      today,
+    });
+
+  it('keeps only the last 30 days', () => {
+    const result = filter(RECENT_FILTER);
+
+    expect(result.map((summary) => summary.mentor)).toEqual(['Recent']);
+    expect(result[0]?.filteredDiplomas).toHaveLength(2);
+  });
+
+  it('ranks count sorts by the matching theses when filtered', () => {
+    // Old has more theses overall (4 to 3), Recent more in 2026 (3 to 1).
+    expect(filter('2026').map((summary) => summary.mentor)).toEqual([
+      'Recent',
+      'Old',
+    ]);
+    expect(filter('').map((summary) => summary.mentor)).toEqual([
+      'Old',
+      'Recent',
+    ]);
   });
 });
