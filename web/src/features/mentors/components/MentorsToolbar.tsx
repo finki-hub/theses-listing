@@ -8,9 +8,11 @@ import { interpolate } from '@/lib/i18n';
 import { useLanguage } from '@/lib/LanguageProvider';
 import { getStatusLabel } from '@/lib/statuses';
 
-import type { SectionId } from '../section';
+import type { SectionId, StatusTone } from '../section';
 
+import { FILTERABLE_TONES, toneFilterValue } from '../selectors';
 import MentorsSearchInput from './MentorsSearchInput';
+import StatusToneFilter from './StatusToneFilter';
 
 type MentorsToolbarProps = {
   filteredDiplomasCount: number;
@@ -25,6 +27,7 @@ type MentorsToolbarProps = {
   setYearFilter: (value: string) => void;
   statusFilter: string;
   statusOptions: string[];
+  toneCounts: Record<StatusTone, number>;
   totalDiplomasCount: number;
   totalMentorsCount: number;
   yearFilter: string;
@@ -36,6 +39,13 @@ const fieldLabelClass = 'block text-sm font-medium text-foreground';
 const MentorsToolbar = (props: MentorsToolbarProps) => {
   const { language, t } = useLanguage();
   const searchId = createUniqueId();
+  const toneLabel = (tone: StatusTone) =>
+    ({
+      cancelled: t().statusCancelled,
+      complete: t().statusComplete,
+      progress: t().statusInProgress,
+      unknown: '',
+    })[tone];
   const date = () =>
     props.lastUpdatedAt
       ? formatUpdatedAt(props.lastUpdatedAt, language())
@@ -72,16 +82,30 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
               >
                 {t().allStatuses}
               </option>
-              <For each={props.statusOptions}>
-                {(status) => (
-                  <option
-                    selected={props.statusFilter === status}
-                    value={status}
-                  >
-                    {getStatusLabel(status, props.section, language())}
-                  </option>
-                )}
-              </For>
+              <optgroup label={t().statusState}>
+                <For each={FILTERABLE_TONES}>
+                  {(tone) => (
+                    <option
+                      selected={props.statusFilter === toneFilterValue(tone)}
+                      value={toneFilterValue(tone)}
+                    >
+                      {toneLabel(tone)}
+                    </option>
+                  )}
+                </For>
+              </optgroup>
+              <optgroup label={t().statusDetailed}>
+                <For each={props.statusOptions}>
+                  {(status) => (
+                    <option
+                      selected={props.statusFilter === status}
+                      value={status}
+                    >
+                      {getStatusLabel(status, props.section, language())}
+                    </option>
+                  )}
+                </For>
+              </optgroup>
             </NativeSelect>
           </label>
 
@@ -112,6 +136,14 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
             </NativeSelect>
           </label>
         </div>
+      </div>
+
+      <div class="mt-3">
+        <StatusToneFilter
+          counts={props.toneCounts}
+          onChange={props.setStatusFilter}
+          value={props.statusFilter}
+        />
       </div>
 
       <div class="mt-3 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-4">

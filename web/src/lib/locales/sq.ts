@@ -68,10 +68,14 @@ export const sq = {
   sortMentor: 'Sipas mentorit',
   staleWarning:
     'Përditësimi i fundit dështoi, prandaj të dhënat mund të jenë të vjetruara.',
+  statsUnfiltered:
+    'Statistikat përfshijnë të gjitha punimet, pa filtrat më poshtë.',
   status: 'Statusi',
   statusCancelled: 'Anuluar',
   statusComplete: 'Përfunduar',
+  statusDetailed: 'Statusi i detajuar',
   statusInProgress: 'Në proces',
+  statusState: 'Gjendja',
   statusStep: 'Hapi {step} nga {total}',
   student: 'Studenti',
   themeDark: 'E errët',

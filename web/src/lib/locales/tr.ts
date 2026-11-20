@@ -69,10 +69,14 @@ export const tr = {
   sortMentor: 'Danışmana göre',
   staleWarning:
     'Son güncelleme başarısız oldu, bu nedenle veriler güncel olmayabilir.',
+  statsUnfiltered:
+    'İstatistikler tüm tezleri kapsar, aşağıdaki filtreleri dikkate almaz.',
   status: 'Durum',
   statusCancelled: 'İptal edildi',
   statusComplete: 'Tamamlandı',
+  statusDetailed: 'Ayrıntılı durum',
   statusInProgress: 'Devam ediyor',
+  statusState: 'Durum',
   statusStep: 'Adım {step} / {total}',
   student: 'Öğrenci',
   themeDark: 'Koyu',
