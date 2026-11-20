@@ -32,11 +32,15 @@ jobs:
           cache: npm
 
       - name: Install Dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
+
+      # Normally a postinstall step; the build imports the generated file.
+      - name: Generate Build Revision
+        run: node scripts/build-revision.mjs
 
       - name: Install Chromium
         working-directory: web
-        run: npx playwright install --with-deps chromium
+        run: npm run test:e2e:install
 
       - name: Run Smoke Tests
         working-directory: web

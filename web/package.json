@@ -42,7 +42,8 @@
     "prebuild": "node ../scripts/build-revision.mjs",
     "preview": "vite preview",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "type": "module",
   "version": "0.0.0"
