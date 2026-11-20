@@ -10,13 +10,12 @@ import {
 } from 'solid-js';
 
 import type { Language } from '@/lib/i18n';
-import type { Diploma } from '@/types';
+import type { Diploma, MentorSummary } from '@/types';
 
 import { captureAnalytics } from '@/lib/analytics';
 import { createSearchAnalytics } from '@/lib/search-analytics';
 
 import type { CatalogResult } from '../api';
-import type { SortField } from '../types';
 
 import {
   getInitialMentorsPageState,
@@ -26,6 +25,7 @@ import {
   createStatusToneResolver,
   getStatusInfo as getSectionStatusInfo,
   type SectionConfig,
+  type StatusTone,
 } from '../section';
 import {
   buildFilteredSummaries,
@@ -35,7 +35,8 @@ import {
   calculateTopMentorsDiplomaCount,
   countByTone,
 } from '../selectors';
-import { aggregateByMentor } from '../utils';
+import { isCountSort, type SortField } from '../types';
+import { aggregateByMentor, countCommitteeSeats } from '../utils';
 import { countByYear } from '../year-stats';
 import {
   countAutoExpandable,
@@ -113,6 +114,34 @@ const createThesesResource = (options: ThesesResourceOptions) => {
   return [resource, { ...actions, refetch }] as const;
 };
 
+// Whole-section statistics; like the stats cards, they ignore the filters.
+const createSectionStats = (options: {
+  diplomas: Accessor<Diploma[] | undefined>;
+  getStatusTone: (status: string) => StatusTone;
+  mentorSummaries: Accessor<MentorSummary[]>;
+  totalDiplomasCount: Accessor<number>;
+}) => {
+  const topTenDiplomasCount = createMemo(() =>
+    calculateTopMentorsDiplomaCount(options.mentorSummaries(), 10),
+  );
+  return {
+    committeeCounts: createMemo(() =>
+      countCommitteeSeats(options.diplomas() ?? []),
+    ),
+    medianDiplomas: createMemo(() =>
+      calculateMedianDiplomas(options.mentorSummaries()),
+    ),
+    topTenDiplomasCount,
+    topTenMentorsShare: createMemo(() => {
+      const total = options.totalDiplomasCount();
+      return total === 0 ? 0 : (topTenDiplomasCount() / total) * 100;
+    }),
+    yearStats: createMemo(() =>
+      countByYear(options.diplomas() ?? [], options.getStatusTone),
+    ),
+  };
+};
+
 export const useMentorsPageState = (
   config: SectionConfig,
   language: Accessor<Language> = () => 'mk',
@@ -184,21 +213,17 @@ export const useMentorsPageState = (
     buildStatusOptions(diplomas(), config.getStatusStage),
   );
   const yearOptions = createMemo(() => buildYearOptions(diplomas()));
-  // Over all theses, like the other statistics.
-  const yearStats = createMemo(() =>
-    countByYear(diplomas() ?? [], getStatusTone),
-  );
-  const medianDiplomas = createMemo(() =>
-    calculateMedianDiplomas(mentorSummaries()),
-  );
-  const topTenDiplomasCount = createMemo(() =>
-    calculateTopMentorsDiplomaCount(mentorSummaries(), 10),
-  );
-  const topTenMentorsShare = createMemo(() => {
-    const totalDiplomas = totalDiplomasCount();
-    return totalDiplomas === 0
-      ? 0
-      : (topTenDiplomasCount() / totalDiplomas) * 100;
+  const {
+    committeeCounts,
+    medianDiplomas,
+    topTenDiplomasCount,
+    topTenMentorsShare,
+    yearStats,
+  } = createSectionStats({
+    diplomas,
+    getStatusTone,
+    mentorSummaries,
+    totalDiplomasCount,
   });
   const hasActiveFilters = createMemo(
     () =>
@@ -265,7 +290,7 @@ export const useMentorsPageState = (
     }
 
     setSortField(field);
-    setSortDirection(field === 'totalDiplomas' ? 'desc' : 'asc');
+    setSortDirection(isCountSort(field) ? 'desc' : 'asc');
   };
 
   const clearFilters = () => {
@@ -276,6 +301,7 @@ export const useMentorsPageState = (
 
   return {
     clearFilters,
+    committeeCounts,
     diplomas,
     expandedMentors,
     filteredDiplomasCount,

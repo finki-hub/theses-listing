@@ -21,6 +21,7 @@ export const sq = {
   fileMissing: 'Skedari nuk është i disponueshëm',
   github: 'Depoja në GitHub',
   hideAbstract: 'Fshih abstraktin',
+  inProgressCount: '{count} në proces',
   language: 'Gjuha',
   lastUpdated: 'Përditësimi i fundit: {date}',
   linkCopied: 'Lidhja u kopjua.',
@@ -29,6 +30,7 @@ export const sq = {
   loading: 'Po ngarkohen të dhënat…',
   median: 'Mediana për mentor',
   mentor: 'Mentori',
+  mentorCommittee: 'Në komisione: {count}',
   mentorPeakYear: 'Viti më i ngarkuar: {year} ({count})',
   mentorsResults: 'Mentorë: {shown} nga {total}',
   mentorThesesTotal: 'Gjithsej punime: {count}',
@@ -67,9 +69,10 @@ export const sq = {
     },
   },
   showAbstract: 'Shfaq abstraktin',
-  sortCount: 'Sipas numrit',
+  sortCount: 'Numri',
   sorting: 'Renditja',
-  sortMentor: 'Sipas mentorit',
+  sortInProgress: 'Aktive',
+  sortMentor: 'Mentori',
   staleWarning:
     'Përditësimi i fundit dështoi, prandaj të dhënat mund të jenë të vjetruara.',
   statsUnfiltered:

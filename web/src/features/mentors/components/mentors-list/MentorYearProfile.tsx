@@ -21,6 +21,7 @@ import { activeYearRange, countByYear, findPeakYear } from '../../year-stats';
 import { toneDotClasses } from '../StatusToneFilter';
 
 type YearProfileContextValue = {
+  readonly committeeCounts: Accessor<ReadonlyMap<string, number>>;
   readonly getStatusTone: (status: string) => StatusTone;
   // The section's year span, so every mentor is drawn on the same axis.
   readonly years: Accessor<readonly string[]>;
@@ -30,14 +31,18 @@ const YearProfileContext = createContext<YearProfileContextValue>();
 
 export const YearProfileProvider = (props: {
   children: JSX.Element;
+  committeeCounts: ReadonlyMap<string, number>;
   getStatusTone: (status: string) => StatusTone;
   years: readonly string[];
 }) => {
   const years = createMemo(() => props.years);
+  const committeeCounts = createMemo(() => props.committeeCounts);
   // The resolver is a stable function for the page's lifetime.
   const getStatusTone = (status: string) => props.getStatusTone(status);
   return (
-    <YearProfileContext.Provider value={{ getStatusTone, years }}>
+    <YearProfileContext.Provider
+      value={{ committeeCounts, getStatusTone, years }}
+    >
       {props.children}
     </YearProfileContext.Provider>
   );
@@ -50,7 +55,10 @@ const TONES: StatusTone[] = ['complete', 'progress', 'cancelled'];
 
 // A mentor's whole record at a glance, independent of the active filters:
 // theses per year on the section's shared axis, plus totals by state.
-const MentorYearProfile = (props: { diplomas: readonly Diploma[] }) => {
+const MentorYearProfile = (props: {
+  diplomas: readonly Diploma[];
+  mentor: string;
+}) => {
   const { language, t } = useLanguage();
   const context = useContext(YearProfileContext);
 
@@ -115,6 +123,15 @@ const MentorYearProfile = (props: { diplomas: readonly Diploma[] }) => {
                   </span>
                 )}
               </For>
+              <Show when={context?.committeeCounts().get(props.mentor)}>
+                {(count) => (
+                  <span>
+                    {interpolate(t().mentorCommittee, {
+                      count: formatNumber(count(), language()),
+                    })}
+                  </span>
+                )}
+              </Show>
               <Show when={range()}>
                 {(value) => (
                   <span>

@@ -1,8 +1,17 @@
-import type {
-  InitialMentorsPageState,
-  SortDirection,
-  SortField,
+import {
+  type InitialMentorsPageState,
+  isCountSort,
+  type SortDirection,
+  type SortField,
 } from './types';
+
+const SORT_FIELDS: ReadonlySet<string> = new Set([
+  'inProgress',
+  'mentor',
+  'totalDiplomas',
+]);
+const isSortField = (value: null | string): value is SortField =>
+  value !== null && SORT_FIELDS.has(value);
 
 const DEFAULT_SORT_FIELD: SortField = 'totalDiplomas';
 
@@ -14,13 +23,13 @@ export const getInitialMentorsPageState = (
   const sortField = params.get('sort');
   const sortDirection = params.get('dir');
 
-  const nextSortField: SortField =
-    sortField === 'mentor' || sortField === 'totalDiplomas'
-      ? sortField
-      : DEFAULT_SORT_FIELD;
+  const nextSortField: SortField = isSortField(sortField)
+    ? sortField
+    : DEFAULT_SORT_FIELD;
 
-  const defaultDirectionForField: SortDirection =
-    nextSortField === 'totalDiplomas' ? 'desc' : 'asc';
+  const defaultDirectionForField: SortDirection = isCountSort(nextSortField)
+    ? 'desc'
+    : 'asc';
 
   const nextSortDirection: SortDirection =
     sortDirection === 'asc' || sortDirection === 'desc'
@@ -59,8 +68,7 @@ export const syncMentorsSearchParams = (options: {
 }) => {
   const params = new URLSearchParams();
   const trimmedSearch = options.search.trim();
-  const defaultSortDirection =
-    options.sortField === 'totalDiplomas' ? 'desc' : 'asc';
+  const defaultSortDirection = isCountSort(options.sortField) ? 'desc' : 'asc';
 
   if (trimmedSearch.length > 0) {
     params.set('q', trimmedSearch);

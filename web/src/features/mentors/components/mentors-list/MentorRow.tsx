@@ -11,6 +11,7 @@ import { displayName } from '../../utils';
 import HighlightedText from '../HighlightedText';
 import DiplomaCountBadge from './DiplomaCountBadge';
 import DiplomaDetailsTable from './DiplomaDetailsTable';
+import InProgressCount from './InProgressCount';
 
 const MentorRow = (props: MentorListItemProps) => {
   const { language } = useLanguage();
@@ -49,6 +50,9 @@ const MentorRow = (props: MentorListItemProps) => {
           </button>
         </TableCell>
         <TableCell class="text-right">
+          <InProgressCount count={props.summary.inProgressCount} />
+        </TableCell>
+        <TableCell class="text-right">
           <DiplomaCountBadge
             filteredCount={props.summary.filteredDiplomas.length}
             hasActiveFilters={props.hasActiveFilters}
@@ -61,7 +65,7 @@ const MentorRow = (props: MentorListItemProps) => {
         <TableRow class="hover:bg-transparent">
           <TableCell
             class="p-0 whitespace-normal"
-            colSpan={props.showRank ? 3 : 2}
+            colSpan={props.showRank ? 4 : 3}
             id={detailsId}
           >
             <DiplomaDetailsTable

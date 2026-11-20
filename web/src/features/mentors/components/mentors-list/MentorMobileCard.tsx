@@ -11,6 +11,7 @@ import { displayName } from '../../utils';
 import HighlightedText from '../HighlightedText';
 import DiplomaCountBadge from './DiplomaCountBadge';
 import DiplomaDetailsTable from './DiplomaDetailsTable';
+import InProgressCount from './InProgressCount';
 
 const MentorMobileCard = (props: MentorListItemProps) => {
   const { language } = useLanguage();
@@ -46,6 +47,12 @@ const MentorMobileCard = (props: MentorListItemProps) => {
                 </Show>
                 <HighlightedText
                   text={displayName(props.summary.mentor, language())}
+                />
+              </div>
+              <div class="mt-0.5 text-xs">
+                <InProgressCount
+                  count={props.summary.inProgressCount}
+                  withLabel
                 />
               </div>
             </div>
