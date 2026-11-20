@@ -66,6 +66,9 @@ export const mk = {
   staleWarning:
     'Последното освежување не успеа, па податоците можеби не се најнови.',
   status: 'Статус',
+  statusCancelled: 'Откажано',
+  statusComplete: 'Завршено',
+  statusInProgress: 'Во тек',
   statusStep: 'Чекор {step} од {total}',
   student: 'Студент',
   themeDark: 'Темна',

@@ -81,7 +81,7 @@ const MobileDiplomaCard = (props: {
           text={displayName(props.diploma.student, language())}
         />
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex items-start gap-2">
         <div class="min-w-0 flex-1">
           <StatusBadge
             info={props.getStatusInfo(props.diploma.status)}
@@ -89,11 +89,11 @@ const MobileDiplomaCard = (props: {
             status={props.diploma.status}
           />
         </div>
-        <span class="shrink-0 text-xs whitespace-nowrap text-muted-foreground tabular-nums">
+        <span class="shrink-0 pt-0.5 text-xs whitespace-nowrap text-muted-foreground tabular-nums">
           <DateDisplay value={props.diploma.dateOfSubmission} />
         </span>
         <DownloadButton
-          class="-mr-1.5 shrink-0"
+          class="-mt-1 -mr-1.5 shrink-0"
           getSearchAttemptId={props.getSearchAttemptId}
           section={props.section}
           url={url()}

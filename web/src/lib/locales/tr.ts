@@ -66,6 +66,9 @@ export const tr = {
   staleWarning:
     'Son güncelleme başarısız oldu, bu nedenle veriler güncel olmayabilir.',
   status: 'Durum',
+  statusCancelled: 'İptal edildi',
+  statusComplete: 'Tamamlandı',
+  statusInProgress: 'Devam ediyor',
   statusStep: 'Adım {step} / {total}',
   student: 'Öğrenci',
   themeDark: 'Koyu',
