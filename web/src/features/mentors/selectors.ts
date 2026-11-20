@@ -88,10 +88,17 @@ const compareSummaries = (
       displayName(b.mentor, options.language),
       languageLocales[options.language],
     );
-  } else if (options.hasQuery) {
-    comparison = a.filteredDiplomas.length - b.filteredDiplomas.length;
   } else {
-    comparison = a.totalDiplomas - b.totalDiplomas;
+    const countOf = (summary: FilteredMentorSummary) =>
+      options.hasQuery
+        ? summary.filteredDiplomas.length
+        : summary.totalDiplomas;
+    comparison =
+      options.sortField === 'inProgress'
+        ? a.inProgressCount - b.inProgressCount ||
+          // Equal workloads: the more experienced mentor first.
+          countOf(a) - countOf(b)
+        : countOf(a) - countOf(b);
   }
 
   return options.sortDirection === 'asc' ? comparison : -comparison;
@@ -134,6 +141,10 @@ export const buildFilteredSummaries = (options: {
         : {
             ...summary,
             filteredDiplomas: matchingDiplomas,
+            inProgressCount: matchingDiplomas.filter(
+              (diploma) =>
+                filterOptions.getStatusTone(diploma.status) === 'progress',
+            ).length,
             matchedByMentor: normalizedQuery.length > 0 && mentorMatches,
           };
     })

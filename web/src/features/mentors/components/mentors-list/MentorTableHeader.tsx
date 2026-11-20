@@ -47,6 +47,26 @@ const MentorTableHeader = (props: MentorTableHeaderProps) => {
           </button>
         </TableHead>
         <TableHead
+          aria-sort={ariaSort('inProgress')}
+          class="w-32 text-right"
+          scope="col"
+        >
+          <button
+            class="ml-auto flex cursor-pointer items-center rounded-sm font-medium ring-offset-background transition-colors hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            onClick={() => {
+              props.onSort('inProgress');
+            }}
+            type="button"
+          >
+            {t().statusInProgress}
+            <SortIcon
+              currentDirection={props.sortDirection}
+              currentField={props.sortField}
+              field="inProgress"
+            />
+          </button>
+        </TableHead>
+        <TableHead
           aria-sort={ariaSort('totalDiplomas')}
           class="text-right"
           scope="col"

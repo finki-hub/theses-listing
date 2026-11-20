@@ -12,6 +12,8 @@ const CANCELLED_CHIP = /Cancelled/u;
 const CANCELLED_URL = /status=tone%3Acancelled/u;
 const MASTERS_URL = /\/masters\?q=medical/u;
 const YEAR_URL = /year=2019/u;
+const IN_PROGRESS_URL = /sort=inProgress/u;
+const MENTOR_NAME = /Ana Petrovska|Marko Nikolov/u;
 
 // Names are matched as substrings, so rank prefixes and counts don't matter.
 const mentorButton = (page: Page, name: string) =>
@@ -166,4 +168,32 @@ test('filters by a year from the chart and profiles a mentor', async ({
   await mentorButton(page, 'Mentor 002').click();
   await expect(page.getByText('All theses: 1')).toBeVisible();
   await expect(page.getByText('Busiest year: 2019 (1)')).toBeVisible();
+});
+
+test('sorts by current workload and shows committee work', async ({
+  isMobile,
+  page,
+}) => {
+  await mockCatalogs(page);
+  // Reverse name order puts Marko first; Ana has the thesis in progress.
+  await page.goto('/?sort=mentor&dir=desc');
+  await expect(
+    page.getByRole('button', { name: MENTOR_NAME }).first(),
+  ).toContainText(MARKO);
+
+  // Phones sort with chips; wider screens with the column header.
+  await (
+    isMobile
+      ? page.getByRole('button', { exact: true, name: 'Active' })
+      : page
+          .getByRole('columnheader', { name: 'In progress' })
+          .getByRole('button')
+  ).click();
+
+  await expect(page).toHaveURL(IN_PROGRESS_URL);
+  const mentors = page.getByRole('button', { name: MENTOR_NAME });
+  await expect(mentors.first()).toContainText(ANA);
+
+  await mentorButton(page, ANA).click();
+  await expect(page.getByText('On committees: 1')).toBeVisible();
 });

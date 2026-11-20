@@ -26,6 +26,21 @@ export const aggregateByMentor = (diplomas: Diploma[]): MentorSummary[] => {
   })).sort((a, b) => b.totalDiplomas - a.totalDiplomas);
 };
 
+// How many theses each person sat on the committee for (either seat).
+export const countCommitteeSeats = (
+  diplomas: readonly Diploma[],
+): ReadonlyMap<string, number> => {
+  const counts = new Map<string, number>();
+  for (const diploma of diplomas) {
+    for (const member of [diploma.member1, diploma.member2]) {
+      const name = member.trim();
+      if (name.length > 0) counts.set(name, (counts.get(name) ?? 0) + 1);
+    }
+  }
+
+  return counts;
+};
+
 export const getSubmissionYear = (value: string): null | string => {
   // Masters dates carry a time suffix ("03.07.2026 11:00"); the year lives in
   // the leading date token.

@@ -163,6 +163,7 @@ export default function MentorsPage(props: MentorsPageProps) {
             >
               <SearchQueryProvider query={state.search()}>
                 <YearProfileProvider
+                  committeeCounts={state.committeeCounts()}
                   getStatusTone={state.getStatusTone}
                   years={state.yearStats().years.map((entry) => entry.year)}
                 >

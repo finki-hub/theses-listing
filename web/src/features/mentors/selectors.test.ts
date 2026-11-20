@@ -9,7 +9,7 @@ import {
   parseToneFilter,
   toneFilterValue,
 } from './selectors';
-import { aggregateByMentor } from './utils';
+import { aggregateByMentor, countCommitteeSeats } from './utils';
 
 const thesis: Diploma = {
   dateOfSubmission: '03.07.2026',
@@ -84,5 +84,57 @@ describe('state filter', () => {
     expect(parseToneFilter('tone:progress')).toBe('progress');
     expect(parseToneFilter('tone:unknown')).toBeNull();
     expect(parseToneFilter('Пријава')).toBeNull();
+  });
+});
+
+describe('current workload', () => {
+  const getStatusTone = createStatusToneResolver(DIPLOMAS_SECTION);
+  // Busy: 1 of 3 in progress. Free: 0 of 1. Load: 2 of 2.
+  const theses: Diploma[] = [
+    { ...thesis, mentor: 'Busy', status: 'Одбрана' },
+    { ...thesis, mentor: 'Busy', status: 'Одбрана' },
+    { ...thesis, mentor: 'Busy', status: 'Пријава' },
+    { ...thesis, mentor: 'Free', status: 'Одбрана' },
+    { ...thesis, mentor: 'Load', status: 'Пријава' },
+    { ...thesis, mentor: 'Load', status: 'Пријава' },
+  ];
+  const summaries = buildFilteredSummaries({
+    getStatusTone,
+    query: '',
+    section: 'diplomas',
+    selectedStatus: '',
+    selectedYear: '',
+    sortDirection: 'desc',
+    sortField: 'inProgress',
+    summaries: aggregateByMentor(theses),
+  });
+
+  it('counts theses in progress per mentor', () => {
+    expect(
+      Object.fromEntries(
+        summaries.map((summary) => [summary.mentor, summary.inProgressCount]),
+      ),
+    ).toEqual({ Busy: 1, Free: 0, Load: 2 });
+  });
+
+  it('sorts by theses in progress', () => {
+    expect(summaries.map((summary) => summary.mentor)).toEqual([
+      'Load',
+      'Busy',
+      'Free',
+    ]);
+  });
+});
+
+describe('countCommitteeSeats', () => {
+  it('counts both committee seats and skips empty ones', () => {
+    const counts = countCommitteeSeats([
+      thesis,
+      { ...thesis, member1: 'Борис Борисов', member2: '' },
+    ]);
+
+    expect(counts.get('Борис Борисов')).toBe(2);
+    expect(counts.get('Ана Анева')).toBe(1);
+    expect(counts.has('')).toBe(false);
   });
 });

@@ -21,6 +21,7 @@ export const tr = {
   fileMissing: 'Dosya mevcut değil',
   github: 'GitHub deposu',
   hideAbstract: 'Özeti gizle',
+  inProgressCount: '{count} sürüyor',
   language: 'Dil',
   lastUpdated: 'Son güncelleme: {date}',
   linkCopied: 'Bağlantı kopyalandı.',
@@ -29,6 +30,7 @@ export const tr = {
   loading: 'Veriler yükleniyor…',
   median: 'Danışman başına medyan',
   mentor: 'Danışman',
+  mentorCommittee: 'Jüri üyeliği: {count}',
   mentorPeakYear: 'En yoğun yıl: {year} ({count})',
   mentorsResults: 'Danışmanlar: {total} kişiden {shown} kişi',
   mentorThesesTotal: 'Toplam tez: {count}',
@@ -68,9 +70,10 @@ export const tr = {
     },
   },
   showAbstract: 'Özeti göster',
-  sortCount: 'Sayıya göre',
+  sortCount: 'Sayı',
   sorting: 'Sıralama',
-  sortMentor: 'Danışmana göre',
+  sortInProgress: 'Süren',
+  sortMentor: 'Danışman',
   staleWarning:
     'Son güncelleme başarısız oldu, bu nedenle veriler güncel olmayabilir.',
   statsUnfiltered:

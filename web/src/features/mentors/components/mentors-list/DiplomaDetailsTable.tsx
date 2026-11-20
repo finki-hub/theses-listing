@@ -119,7 +119,10 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
   const isWide = createMediaQuery(BREAKPOINTS.md);
   return (
     <div class="bg-muted/30 px-4 py-3 md:px-8 md:py-4">
-      <MentorYearProfile diplomas={props.allDiplomas} />
+      <MentorYearProfile
+        diplomas={props.allDiplomas}
+        mentor={props.mentor}
+      />
       {/* Card layout below md: the fixed-width columns need room to read well. */}
       <Show
         fallback={

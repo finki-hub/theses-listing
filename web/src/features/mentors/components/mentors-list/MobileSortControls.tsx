@@ -49,6 +49,13 @@ const MobileSortControls = (props: SortControlsProps) => {
           sortField={props.sortField}
         />
         <SortButton
+          field="inProgress"
+          label={t().sortInProgress}
+          onSort={props.onSort}
+          sortDirection={props.sortDirection}
+          sortField={props.sortField}
+        />
+        <SortButton
           field="mentor"
           label={t().sortMentor}
           onSort={props.onSort}
