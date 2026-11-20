@@ -37,13 +37,14 @@ export type MentorListItemProps = {
 };
 
 export type MentorsListProps = {
-  expandedMentor: null | string;
   filteredSummaries: FilteredMentorSummary[];
   getCountShare: (count: number) => number;
   getFileUrl: (fileId: null | string) => null | string;
   getSearchAttemptId: () => string | undefined;
   getStatusInfo: (status: string) => StatusInfo;
   hasActiveFilters: boolean;
+  isExpanded: (mentor: string) => boolean;
+  onClearFilters: () => void;
   onSort: (field: SortField) => void;
   onToggle: (mentor: string) => void;
   section: 'diplomas' | 'masters';

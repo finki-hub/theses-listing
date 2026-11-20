@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { SearchQueryProvider } from '@/features/mentors/components/HighlightedText';
 import LoadingSpinner from '@/features/mentors/components/LoadingSpinner';
 import MentorsList from '@/features/mentors/components/MentorsList';
 import MentorsPageHeader from '@/features/mentors/components/MentorsPageHeader';
@@ -67,8 +68,10 @@ export default function MentorsPage(props: MentorsPageProps) {
             <MentorsToolbar
               filteredDiplomasCount={state.filteredDiplomasCount()}
               filteredMentorsCount={state.filteredSummaries().length}
+              hasActiveFilters={state.hasActiveFilters()}
               isStale={state.isStale()}
               lastUpdatedAt={state.lastUpdatedAt()}
+              onClearFilters={state.clearFilters}
               search={state.search()}
               section={props.config.id}
               setSearch={state.setSearch}
@@ -116,21 +119,24 @@ export default function MentorsPage(props: MentorsPageProps) {
                 (!state.diplomas.loading || state.totalDiplomasCount() > 0)
               }
             >
-              <MentorsList
-                expandedMentor={state.expandedMentor()}
-                filteredSummaries={state.filteredSummaries()}
-                getCountShare={state.getCountShare}
-                getFileUrl={props.config.getFileUrl}
-                getSearchAttemptId={state.getSearchAttemptId}
-                getStatusInfo={state.getStatusInfo}
-                hasActiveFilters={state.hasActiveFilters()}
-                onSort={state.handleSort}
-                onToggle={state.toggleExpanded}
-                section={props.config.id}
-                sortDirection={state.sortDirection()}
-                sortField={state.sortField()}
-                tableCountHeader={strings().tableCountHeader}
-              />
+              <SearchQueryProvider query={state.search()}>
+                <MentorsList
+                  filteredSummaries={state.filteredSummaries()}
+                  getCountShare={state.getCountShare}
+                  getFileUrl={props.config.getFileUrl}
+                  getSearchAttemptId={state.getSearchAttemptId}
+                  getStatusInfo={state.getStatusInfo}
+                  hasActiveFilters={state.hasActiveFilters()}
+                  isExpanded={state.isExpanded}
+                  onClearFilters={state.clearFilters}
+                  onSort={state.handleSort}
+                  onToggle={state.toggleExpanded}
+                  section={props.config.id}
+                  sortDirection={state.sortDirection()}
+                  sortField={state.sortField()}
+                  tableCountHeader={strings().tableCountHeader}
+                />
+              </SearchQueryProvider>
             </Show>
           </CardContent>
         </Card>

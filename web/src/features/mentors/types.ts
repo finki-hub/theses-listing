@@ -2,10 +2,13 @@ import type { Diploma, MentorSummary } from '@/types';
 
 export type FilteredMentorSummary = MentorSummary & {
   filteredDiplomas: Diploma[];
+  // True when an active search matched the mentor's name rather than only
+  // the theses' titles, students or statuses.
+  matchedByMentor: boolean;
 };
 
 export type InitialMentorsPageState = {
-  expandedMentor: null | string;
+  expandedMentors: string[];
   search: string;
   sortDirection: SortDirection;
   sortField: SortField;

@@ -10,6 +10,7 @@ import type { StatusInfo } from '../../section';
 import type { DiplomaDetailsTableProps } from './types';
 
 import { displayName } from '../../utils';
+import HighlightedText from '../HighlightedText';
 import StatusBadge from './StatusBadge';
 
 const DateDisplay = (props: { value: string }) => {
@@ -36,7 +37,9 @@ const MobileDiplomaCard = (props: {
             class="mt-1 wrap-break-word font-medium leading-5"
             style={{ 'overflow-wrap': 'anywhere' }}
           >
-            {displayName(props.diploma.student, language())}
+            <HighlightedText
+              text={displayName(props.diploma.student, language())}
+            />
           </div>
         </div>
         <div>
@@ -47,7 +50,7 @@ const MobileDiplomaCard = (props: {
             class="mt-1 wrap-break-word leading-5 text-foreground/90"
             style={{ 'overflow-wrap': 'anywhere' }}
           >
-            {props.diploma.title}
+            <HighlightedText text={props.diploma.title} />
           </div>
         </div>
         <div class="grid gap-3 rounded-lg bg-muted/40 p-3">
@@ -150,13 +153,15 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
             {(diploma) => (
               <tr class="border-b border-border/50 last:border-0">
                 <td class="py-2 pr-4 whitespace-nowrap">
-                  {displayName(diploma.student, language())}
+                  <HighlightedText
+                    text={displayName(diploma.student, language())}
+                  />
                 </td>
                 <td
                   class="max-w-xs py-2 pr-4 truncate"
                   title={diploma.title}
                 >
-                  {diploma.title}
+                  <HighlightedText text={diploma.title} />
                 </td>
                 <td class="py-2 pr-4">
                   <StatusBadge

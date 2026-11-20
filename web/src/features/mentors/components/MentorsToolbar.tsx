@@ -1,5 +1,7 @@
-import { For } from 'solid-js';
+import { FilterX } from 'lucide-solid';
+import { createUniqueId, For, Show } from 'solid-js';
 
+import { Button } from '@/components/ui/button';
 import { NativeSelect } from '@/components/ui/input';
 import { formatNumber, formatUpdatedAt } from '@/lib/format';
 import { interpolate } from '@/lib/i18n';
@@ -13,8 +15,10 @@ import MentorsSearchInput from './MentorsSearchInput';
 type MentorsToolbarProps = {
   filteredDiplomasCount: number;
   filteredMentorsCount: number;
+  hasActiveFilters: boolean;
   isStale: boolean;
   lastUpdatedAt: null | string;
+  onClearFilters: () => void;
   search: string;
   section: SectionId;
   setSearch: (value: string) => void;
@@ -28,10 +32,11 @@ type MentorsToolbarProps = {
   yearOptions: string[];
 };
 
-const fieldLabelClass = 'text-sm font-medium text-foreground';
+const fieldLabelClass = 'block text-sm font-medium text-foreground';
 
 const MentorsToolbar = (props: MentorsToolbarProps) => {
   const { language, t } = useLanguage();
+  const searchId = createUniqueId();
   const date = () =>
     props.lastUpdatedAt
       ? formatUpdatedAt(props.lastUpdatedAt, language())
@@ -39,13 +44,19 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
   return (
     <div class="mb-4">
       <div class="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1.15fr)] xl:items-end">
-        <label class="block space-y-1.5">
-          <span class={fieldLabelClass}>{t().search}</span>
+        <div class="space-y-1.5">
+          <label
+            class={fieldLabelClass}
+            for={searchId}
+          >
+            {t().search}
+          </label>
           <MentorsSearchInput
+            id={searchId}
             onInput={props.setSearch}
             value={props.search}
           />
-        </label>
+        </div>
 
         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(180px,1fr)_minmax(140px,0.85fr)] xl:items-end">
           <label class="block space-y-1.5">
@@ -105,16 +116,34 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
       </div>
 
       <div class="mt-3 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <div>
-          {interpolate(t().mentorsResults, {
-            shown: formatNumber(props.filteredMentorsCount, language()),
-            total: formatNumber(props.totalMentorsCount, language()),
-          })}
-          {' · '}
-          {interpolate(t().sections[props.section].results, {
-            shown: formatNumber(props.filteredDiplomasCount, language()),
-            total: formatNumber(props.totalDiplomasCount, language()),
-          })}
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span aria-live="polite">
+            {interpolate(t().mentorsResults, {
+              shown: formatNumber(props.filteredMentorsCount, language()),
+              total: formatNumber(props.totalMentorsCount, language()),
+            })}
+            {' · '}
+            {interpolate(t().sections[props.section].results, {
+              shown: formatNumber(props.filteredDiplomasCount, language()),
+              total: formatNumber(props.totalDiplomasCount, language()),
+            })}
+          </span>
+          <Show when={props.hasActiveFilters}>
+            <Button
+              class="-my-1 h-7 px-2 text-primary hover:text-primary"
+              onClick={() => {
+                props.onClearFilters();
+              }}
+              size="sm"
+              variant="ghost"
+            >
+              <FilterX
+                aria-hidden="true"
+                class="size-4"
+              />
+              {t().clearFilters}
+            </Button>
+          </Show>
         </div>
         <div
           aria-live="polite"

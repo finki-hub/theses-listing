@@ -34,6 +34,7 @@ import {
   calculateTopMentorsDiplomaCount,
 } from '../selectors';
 import { aggregateByMentor } from '../utils';
+import { createMentorExpansion } from './createMentorExpansion';
 
 type ThesesResourceOptions = {
   readonly config: SectionConfig;
@@ -130,9 +131,6 @@ export const useMentorsPageState = (
   const [sortDirection, setSortDirection] = createSignal(
     initialState.sortDirection,
   );
-  const [expandedMentor, setExpandedMentor] = createSignal(
-    initialState.expandedMentor,
-  );
   const mentorSummaries = createMemo(() => {
     const data = diplomas();
     return data ? aggregateByMentor(data) : [];
@@ -186,33 +184,6 @@ export const useMentorsPageState = (
       : Math.max(...summaries.map((summary) => summary.totalDiplomas));
   });
 
-  createEffect(() => {
-    const currentExpandedMentor = expandedMentor();
-    // Don't collapse the expanded mentor before data has loaded,
-    // otherwise URL params get wiped on initial page load.
-    if (!currentExpandedMentor || diplomas.loading || loadError() !== null)
-      return;
-
-    const mentorStillVisible = filteredSummaries().some(
-      (summary) => summary.mentor === currentExpandedMentor,
-    );
-
-    if (!mentorStillVisible) {
-      setExpandedMentor(null);
-    }
-  });
-
-  createEffect(() => {
-    syncMentorsSearchParams({
-      expandedMentor: expandedMentor(),
-      search: search(),
-      sortDirection: sortDirection(),
-      sortField: sortField(),
-      statusFilter: statusFilter(),
-      yearFilter: yearFilter(),
-    });
-  });
-
   // This local-only key invalidates linkage synchronously, even before effects run.
   const searchIntent = () => ({
     filters: JSON.stringify([statusFilter(), yearFilter()]),
@@ -225,6 +196,31 @@ export const useMentorsPageState = (
     intent: searchIntent,
     ready: () => !diplomas.loading && loadError() === null,
     section: config.id,
+  });
+
+  const { expandedMentors, isExpanded, manualExpanded, toggleExpanded } =
+    createMentorExpansion({
+      filteredSummaries,
+      initialExpanded: initialState.expandedMentors,
+      initialSearch: initialState.search,
+      isReady: () => !diplomas.loading && loadError() === null,
+      onOpen: (mentor) => {
+        searchAnalytics.captureResultClick(
+          filteredSummaries().findIndex((summary) => summary.mentor === mentor),
+        );
+      },
+      search,
+    });
+
+  createEffect(() => {
+    syncMentorsSearchParams({
+      expandedMentors: manualExpanded(),
+      search: search(),
+      sortDirection: sortDirection(),
+      sortField: sortField(),
+      statusFilter: statusFilter(),
+      yearFilter: yearFilter(),
+    });
   });
 
   const getCountShare = (count: number) => count / maxDiplomas();
@@ -242,22 +238,16 @@ export const useMentorsPageState = (
     setSortDirection(field === 'totalDiplomas' ? 'desc' : 'asc');
   };
 
-  const toggleExpanded = (mentor: string) => {
-    const isOpening = expandedMentor() !== mentor;
-
-    if (isOpening) {
-      const position = filteredSummaries().findIndex(
-        (summary) => summary.mentor === mentor,
-      );
-      searchAnalytics.captureResultClick(position);
-    }
-
-    setExpandedMentor((previous) => (previous === mentor ? null : mentor));
+  const clearFilters = () => {
+    setSearch('');
+    setStatusFilter('');
+    setYearFilter('');
   };
 
   return {
+    clearFilters,
     diplomas,
-    expandedMentor,
+    expandedMentors,
     filteredDiplomasCount,
     filteredSummaries,
     getCountShare,
@@ -265,6 +255,7 @@ export const useMentorsPageState = (
     getStatusInfo,
     handleSort,
     hasActiveFilters,
+    isExpanded,
     isStale,
     lastUpdatedAt,
     loadError,

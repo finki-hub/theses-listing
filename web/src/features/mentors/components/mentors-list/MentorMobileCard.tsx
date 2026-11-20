@@ -9,6 +9,7 @@ import { useLanguage } from '@/lib/LanguageProvider';
 import type { MentorListItemProps } from './types';
 
 import { displayName } from '../../utils';
+import HighlightedText from '../HighlightedText';
 import DiplomaCountBadge from './DiplomaCountBadge';
 import DiplomaDetailsTable from './DiplomaDetailsTable';
 
@@ -44,7 +45,9 @@ const MentorMobileCard = (props: MentorListItemProps) => {
                 class="mt-1 wrap-break-word text-sm font-semibold leading-5"
                 style={{ 'overflow-wrap': 'anywhere' }}
               >
-                {displayName(props.summary.mentor, language())}
+                <HighlightedText
+                  text={displayName(props.summary.mentor, language())}
+                />
               </div>
             </div>
             <DiplomaCountBadge
