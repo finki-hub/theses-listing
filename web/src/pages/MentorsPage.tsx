@@ -50,7 +50,8 @@ export default function MentorsPage(props: MentorsPageProps) {
         </div>
 
         <MentorsStatsCards
-          loading={state.diplomas.loading}
+          // Keep showing the previous numbers while a retry refetches.
+          loading={state.diplomas.loading && state.totalDiplomasCount() === 0}
           median={state.medianDiplomas()}
           section={props.config.id}
           topTenDiplomasCount={state.topTenDiplomasCount()}

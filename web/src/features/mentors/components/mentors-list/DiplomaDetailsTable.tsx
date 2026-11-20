@@ -106,8 +106,9 @@ const MobileDiplomaCard = (props: {
 const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
   const { language, t } = useLanguage();
   return (
-    <div class="bg-muted/30 px-4 py-3 sm:px-8 sm:py-4">
-      <ul class="divide-y divide-border/60 sm:hidden">
+    <div class="bg-muted/30 px-4 py-3 md:px-8 md:py-4">
+      {/* Card layout below md: the fixed-width columns need room to read well. */}
+      <ul class="divide-y divide-border/60 md:hidden">
         <For each={props.diplomas}>
           {(diploma) => (
             <MobileDiplomaCard
@@ -121,7 +122,7 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
         </For>
       </ul>
 
-      <table class="hidden w-full table-fixed text-sm sm:table">
+      <table class="hidden w-full table-fixed text-sm md:table">
         <thead>
           <tr class="border-b text-muted-foreground">
             <th

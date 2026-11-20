@@ -20,7 +20,7 @@ type MentorsStatsCardsProps = {
 
 type StatProps = {
   class?: string;
-  footer?: JSX.Element;
+  footer?: string;
   label: string;
   loading: boolean;
   value: JSX.Element;
@@ -37,8 +37,15 @@ const Stat = (props: StatProps) => (
         {props.value}
       </Show>
     </dd>
-    <Show when={props.footer}>
-      <dd class="text-xs text-muted-foreground">{props.footer}</dd>
+    <Show when={props.footer !== undefined}>
+      <dd class="text-xs text-muted-foreground">
+        <Show
+          fallback={<Skeleton class="h-3 w-32" />}
+          when={!props.loading}
+        >
+          {props.footer}
+        </Show>
+      </dd>
     </Show>
   </div>
 );
@@ -78,18 +85,14 @@ const MentorsStatsCards = (props: MentorsStatsCardsProps) => {
         />
         <Stat
           class="col-span-2 lg:col-span-1"
-          footer={
-            <Show when={!props.loading}>
-              {interpolate(t().sections[props.section].topTenCount, {
-                shown: formatNumber(props.topTenDiplomasCount, language(), {
-                  useGrouping: false,
-                }),
-                total: formatNumber(props.totalDiplomas, language(), {
-                  useGrouping: false,
-                }),
-              })}
-            </Show>
-          }
+          footer={interpolate(t().sections[props.section].topTenCount, {
+            shown: formatNumber(props.topTenDiplomasCount, language(), {
+              useGrouping: false,
+            }),
+            total: formatNumber(props.totalDiplomas, language(), {
+              useGrouping: false,
+            }),
+          })}
           label={t().topTenShare}
           loading={props.loading}
           value={formatPercentage(props.topTenMentorsShare, language())}
