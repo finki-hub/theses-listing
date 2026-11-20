@@ -38,6 +38,8 @@ const matchesDiploma = (
     mentorMatches ||
     matchesNormalizedSearch(diploma.title, options.query) ||
     matchesNormalizedSearch(diploma.student, options.query) ||
+    matchesNormalizedSearch(diploma.member1, options.query) ||
+    matchesNormalizedSearch(diploma.member2, options.query) ||
     matchesStatusSearch(diploma.status, options.section, options.query);
 
   return matchesStatus && matchesYear && matchesSearch;

@@ -9,6 +9,8 @@ export const mk = {
   clearFilters: 'Исчисти филтри',
   clearSearch: 'Исчисти пребарување',
   closeNotification: 'Затвори известување',
+  committee: 'Комисија',
+  committeeChair: 'претседател',
   copyMentorLink: 'Копирај линк',
   date: 'Датум',
   download: 'Преземи',
@@ -17,6 +19,7 @@ export const mk = {
   file: 'Датотека',
   fileMissing: 'Не постои',
   github: 'GitHub репозиториум',
+  hideAbstract: 'Сокриј апстракт',
   language: 'Јазик',
   lastUpdated: 'Последно освежување: {date}',
   linkCopied: 'Линкот е копиран.',
@@ -32,7 +35,8 @@ export const mk = {
   refreshPending: 'Се подготвува освежување…',
   retry: 'Обиди се повторно',
   search: 'Пребарување',
-  searchPlaceholder: 'Пребарувај по ментор, наслов, студент или статус…',
+  searchPlaceholder:
+    'Пребарувај по ментор, наслов, студент, комисија или статус…',
   sectionNavigation: 'Вид на труд',
   sections: {
     diplomas: {
@@ -60,6 +64,7 @@ export const mk = {
       totalThesesLabel: 'Вкупно магистерски',
     },
   },
+  showAbstract: 'Прикажи апстракт',
   sortCount: 'По број',
   sorting: 'Сортирање',
   sortMentor: 'По ментор',

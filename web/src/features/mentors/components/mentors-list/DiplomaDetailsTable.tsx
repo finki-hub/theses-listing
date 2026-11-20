@@ -15,6 +15,7 @@ import type { DiplomaDetailsTableProps } from './types';
 import { displayName } from '../../utils';
 import HighlightedText from '../HighlightedText';
 import StatusBadge from './StatusBadge';
+import ThesisExtras from './ThesisExtras';
 
 const DateDisplay = (props: { value: string }) => {
   const { language } = useLanguage();
@@ -79,6 +80,12 @@ const MobileDiplomaCard = (props: {
       >
         <HighlightedText
           text={displayName(props.diploma.student, language())}
+        />
+      </div>
+      <div class="-mt-1">
+        <ThesisExtras
+          diploma={props.diploma}
+          section={props.section}
         />
       </div>
       <div class="flex items-start gap-2">
@@ -174,6 +181,10 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
                   style={{ 'overflow-wrap': 'anywhere' }}
                 >
                   <HighlightedText text={diploma.title} />
+                  <ThesisExtras
+                    diploma={diploma}
+                    section={props.section}
+                  />
                 </td>
                 <td class="py-2 pr-4">
                   <StatusBadge
