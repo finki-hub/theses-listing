@@ -119,10 +119,10 @@ export default function MentorsPage(props: MentorsPageProps) {
               <MentorsList
                 expandedMentor={state.expandedMentor()}
                 filteredSummaries={state.filteredSummaries()}
-                getBadgeOpacity={state.getBadgeOpacity}
+                getCountShare={state.getCountShare}
                 getFileUrl={props.config.getFileUrl}
                 getSearchAttemptId={state.getSearchAttemptId}
-                getStatusOpacity={state.getStatusOpacity}
+                getStatusInfo={state.getStatusInfo}
                 hasActiveFilters={state.hasActiveFilters()}
                 onSort={state.handleSort}
                 onToggle={state.toggleExpanded}

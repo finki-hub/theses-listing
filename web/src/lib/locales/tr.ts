@@ -62,6 +62,7 @@ export const tr = {
   sortMentor: 'Danışmana göre',
   staleUpdated: 'Veriler güncel olmayabilir · Son başarılı güncelleme: {date}',
   status: 'Durum',
+  statusStep: 'Adım {step} / {total}',
   student: 'Öğrenci',
   themeDark: 'Koyu',
   themeLight: 'Açık',

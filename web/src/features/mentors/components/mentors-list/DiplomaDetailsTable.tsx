@@ -2,33 +2,15 @@ import { For, Show } from 'solid-js';
 
 import type { Diploma } from '@/types';
 
-import { Badge } from '@/components/ui/badge';
 import DownloadButton from '@/features/mentors/components/mentors-list/DownloadButton.tsx';
 import { formatThesisDate } from '@/lib/format';
 import { useLanguage } from '@/lib/LanguageProvider';
-import { getStatusLabel } from '@/lib/statuses';
 
-import type { SectionId } from '../../section';
+import type { StatusInfo } from '../../section';
 import type { DiplomaDetailsTableProps } from './types';
 
 import { displayName } from '../../utils';
-
-const StatusBadge = (props: {
-  opacity: number;
-  section: SectionId;
-  status: string;
-}) => {
-  const { language } = useLanguage();
-  return (
-    <Badge
-      class="whitespace-normal"
-      style={{ opacity: props.opacity }}
-      variant="default"
-    >
-      {getStatusLabel(props.status, props.section, language()) || '\u{2014}'}
-    </Badge>
-  );
-};
+import StatusBadge from './StatusBadge';
 
 const DateDisplay = (props: { value: string }) => {
   const { language } = useLanguage();
@@ -39,7 +21,7 @@ const MobileDiplomaCard = (props: {
   diploma: Diploma;
   getFileUrl: (fileId: null | string) => null | string;
   getSearchAttemptId: () => string | undefined;
-  getStatusOpacity: (status: string) => number;
+  getStatusInfo: (status: string) => StatusInfo;
   section: 'diplomas' | 'masters';
 }) => {
   const { language, t } = useLanguage();
@@ -75,7 +57,7 @@ const MobileDiplomaCard = (props: {
             </div>
             <div class="mt-1">
               <StatusBadge
-                opacity={props.getStatusOpacity(props.diploma.status)}
+                info={props.getStatusInfo(props.diploma.status)}
                 section={props.section}
                 status={props.diploma.status}
               />
@@ -121,7 +103,7 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
               diploma={diploma}
               getFileUrl={props.getFileUrl}
               getSearchAttemptId={props.getSearchAttemptId}
-              getStatusOpacity={props.getStatusOpacity}
+              getStatusInfo={props.getStatusInfo}
               section={props.section}
             />
           )}
@@ -178,7 +160,7 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
                 </td>
                 <td class="py-2 pr-4">
                   <StatusBadge
-                    opacity={props.getStatusOpacity(diploma.status)}
+                    info={props.getStatusInfo(diploma.status)}
                     section={props.section}
                     status={diploma.status}
                   />

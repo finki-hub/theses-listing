@@ -41,12 +41,10 @@ const DownloadButton = (
       aria-disabled={isLoading()}
       aria-label={props.url === null ? t().fileMissing : t().download}
       class={cn(
-        'inline-flex items-center justify-center rounded-md p-1.5 transition-colors',
+        'inline-flex items-center justify-center rounded-md p-1.5 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         'disabled:opacity-30 disabled:cursor-default',
         isLoading() ? 'opacity-70 cursor-default' : 'cursor-pointer',
-        !isLoading() &&
-          props.url !== null &&
-          'hover:bg-accent hover:[&>svg]:text-background',
+        !isLoading() && props.url !== null && 'hover:bg-muted',
         props.class,
       )}
       disabled={props.url === null}
