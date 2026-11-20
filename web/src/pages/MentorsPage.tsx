@@ -42,7 +42,10 @@ export default function MentorsPage(props: MentorsPageProps) {
 
       <main class="container mx-auto py-6 sm:py-8">
         <div class="mb-6">
-          <SectionSwitch active={props.config.id} />
+          <SectionSwitch
+            active={props.config.id}
+            search={state.search()}
+          />
         </div>
 
         <MentorsStatsCards

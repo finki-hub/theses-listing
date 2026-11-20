@@ -29,6 +29,7 @@ export const mk = {
   retry: 'Обиди се повторно',
   search: 'Пребарување',
   searchPlaceholder: 'Пребарувај по ментор, наслов, студент или статус…',
+  sectionNavigation: 'Вид на труд',
   sections: {
     diplomas: {
       cardDescription:

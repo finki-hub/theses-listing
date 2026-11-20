@@ -1,4 +1,4 @@
-import { useNavigate } from '@solidjs/router';
+import { A } from '@solidjs/router';
 import { For, Show } from 'solid-js';
 
 import { cn } from '@/lib/cn';
@@ -8,6 +8,9 @@ import { DIPLOMAS_SECTION, MASTERS_SECTION, type SectionId } from '../section';
 
 type SectionSwitchProps = {
   active: SectionId;
+  // The free-text search carries over between sections; status and year
+  // filters do not, because their options differ per section.
+  search: string;
 };
 
 type SectionTab = {
@@ -26,39 +29,48 @@ const sectionTabs: SectionTab[] = [
   },
 ];
 
+const buildHref = (basePath: string, search: string) => {
+  const query = search.trim();
+  return query.length > 0
+    ? `${basePath}?${new URLSearchParams({ q: query }).toString()}`
+    : basePath;
+};
+
 const SectionSwitch = (props: SectionSwitchProps) => {
-  const navigate = useNavigate();
   const { t } = useLanguage();
 
   return (
-    <div
+    <nav
+      aria-label={t().sectionNavigation}
       class="inline-flex flex-wrap rounded-xl bg-muted p-1"
-      role="tablist"
     >
       <For each={sectionTabs}>
-        {(tab) => (
-          <button
-            aria-selected={props.active === tab.value}
-            class={cn(
-              'relative inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all',
-              props.active === tab.value
-                ? 'bg-card text-primary shadow-sm'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
-            onClick={() => {
-              navigate(tab.basePath);
-            }}
-            role="tab"
-            type="button"
-          >
-            {t().sections[tab.value].tab}
-            <Show when={props.active === tab.value}>
-              <span class="absolute bottom-1 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-primary" />
-            </Show>
-          </button>
-        )}
+        {(tab) => {
+          const isActive = () => props.active === tab.value;
+          return (
+            <A
+              aria-current={isActive() ? 'page' : undefined}
+              class={cn(
+                'relative inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                isActive()
+                  ? 'bg-card text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+              end
+              href={buildHref(tab.basePath, props.search)}
+            >
+              {t().sections[tab.value].tab}
+              <Show when={isActive()}>
+                <span
+                  aria-hidden="true"
+                  class="absolute bottom-1 left-1/2 h-0.5 w-4 -translate-x-1/2 rounded-full bg-primary"
+                />
+              </Show>
+            </A>
+          );
+        }}
       </For>
-    </div>
+    </nav>
   );
 };
 

@@ -1,5 +1,5 @@
 import { ChevronRight } from 'lucide-solid';
-import { Show } from 'solid-js';
+import { createUniqueId, Show } from 'solid-js';
 
 import { Card } from '@/components/ui/card';
 import { formatNumber } from '@/lib/format';
@@ -14,9 +14,11 @@ import DiplomaDetailsTable from './DiplomaDetailsTable';
 
 const MentorMobileCard = (props: MentorListItemProps) => {
   const { language, t } = useLanguage();
+  const detailsId = createUniqueId();
   return (
     <Card class="gap-0 overflow-hidden border-border/70 py-0 shadow-sm sm:hidden">
       <button
+        aria-controls={props.expanded ? detailsId : undefined}
         aria-expanded={props.expanded}
         class="flex w-full items-start gap-3 px-4 py-4 text-left transition-colors hover:bg-muted/20"
         onClick={() => {
@@ -26,6 +28,7 @@ const MentorMobileCard = (props: MentorListItemProps) => {
       >
         <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
           <ChevronRight
+            aria-hidden="true"
             class={`h-4 w-4 transition-transform duration-200 ${props.expanded ? 'rotate-90' : ''}`}
           />
         </div>
@@ -58,7 +61,10 @@ const MentorMobileCard = (props: MentorListItemProps) => {
       </button>
 
       <Show when={props.expanded}>
-        <div class="border-t border-border/60 bg-muted/20">
+        <div
+          class="border-t border-border/60 bg-muted/20"
+          id={detailsId}
+        >
           <DiplomaDetailsTable
             diplomas={props.summary.filteredDiplomas}
             getFileUrl={props.getFileUrl}

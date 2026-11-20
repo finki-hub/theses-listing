@@ -27,6 +27,7 @@ export const en = {
   retry: 'Try again',
   search: 'Search',
   searchPlaceholder: 'Search by mentor, title, student or status…',
+  sectionNavigation: 'Thesis type',
   sections: {
     diplomas: {
       cardDescription:
