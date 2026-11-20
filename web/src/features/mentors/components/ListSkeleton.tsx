@@ -19,11 +19,9 @@ const ROW_WIDTHS = [
 export default function ListSkeleton() {
   const { t } = useLanguage();
   return (
-    <div
-      class="overflow-hidden rounded-md border"
-      role="status"
-    >
-      <span class="sr-only">{t().loading}</span>
+    <div class="overflow-hidden rounded-md border">
+      {/* <output> has an implicit "status" role, so the message is announced. */}
+      <output class="sr-only">{t().loading}</output>
       <For each={ROW_WIDTHS}>
         {(width) => (
           <div class="flex items-center gap-4 border-b px-4 py-3 last:border-0">

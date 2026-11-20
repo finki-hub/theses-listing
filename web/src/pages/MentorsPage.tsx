@@ -92,15 +92,12 @@ export default function MentorsPage(props: MentorsPageProps) {
             </Show>
 
             <Show when={state.isStale() && state.loadError() === null}>
-              <div
-                class="mb-4 flex flex-col items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-900 sm:flex-row sm:items-center dark:text-amber-200"
-                role="status"
-              >
+              <div class="mb-4 flex flex-col items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-900 sm:flex-row sm:items-center dark:text-amber-200">
                 <TriangleAlert
                   aria-hidden="true"
                   class="hidden size-4 shrink-0 sm:block"
                 />
-                <span class="flex-1">{t().staleWarning}</span>
+                <output class="flex-1">{t().staleWarning}</output>
                 <Button
                   class="h-8 border-amber-500/40 bg-transparent text-current hover:bg-amber-500/15"
                   disabled={state.diplomas.loading}
