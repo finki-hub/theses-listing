@@ -1,5 +1,6 @@
 import { For } from 'solid-js';
 
+import { NativeSelect } from '@/components/ui/input';
 import { formatNumber, formatUpdatedAt } from '@/lib/format';
 import { interpolate } from '@/lib/i18n';
 import { useLanguage } from '@/lib/LanguageProvider';
@@ -27,11 +28,7 @@ type MentorsToolbarProps = {
   yearOptions: string[];
 };
 
-const selectClass =
-  'h-11 w-full rounded-lg border border-border/70 bg-background/90 px-3 py-2 text-sm text-foreground shadow-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
-
-const fieldLabelClass =
-  'text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground';
+const fieldLabelClass = 'text-sm font-medium text-foreground';
 
 const MentorsToolbar = (props: MentorsToolbarProps) => {
   const { language, t } = useLanguage();
@@ -40,7 +37,7 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
       ? formatUpdatedAt(props.lastUpdatedAt, language())
       : t().refreshPending;
   return (
-    <div class="mb-4 rounded-2xl border border-border/60 bg-linear-to-br from-muted/25 via-background to-muted/10 p-4 shadow-sm sm:p-5">
+    <div class="mb-4">
       <div class="grid gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1.15fr)] xl:items-end">
         <label class="block space-y-1.5">
           <span class={fieldLabelClass}>{t().search}</span>
@@ -53,8 +50,7 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
         <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(180px,1fr)_minmax(140px,0.85fr)] xl:items-end">
           <label class="block space-y-1.5">
             <span class={fieldLabelClass}>{t().status}</span>
-            <select
-              class={selectClass}
+            <NativeSelect
               onChange={(event) => {
                 props.setStatusFilter(event.currentTarget.value);
               }}
@@ -76,13 +72,12 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
                   </option>
                 )}
               </For>
-            </select>
+            </NativeSelect>
           </label>
 
           <label class="block space-y-1.5">
             <span class={fieldLabelClass}>{t().year}</span>
-            <select
-              class={selectClass}
+            <NativeSelect
               onChange={(event) => {
                 props.setYearFilter(event.currentTarget.value);
               }}
@@ -104,12 +99,12 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
                   </option>
                 )}
               </For>
-            </select>
+            </NativeSelect>
           </label>
         </div>
       </div>
 
-      <div class="mt-4 flex flex-col gap-2 border-t border-border/50 pt-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+      <div class="mt-3 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           {interpolate(t().mentorsResults, {
             shown: formatNumber(props.filteredMentorsCount, language()),

@@ -14,3 +14,12 @@ export const writeBrowserStorage = (key: string, value: string): boolean => {
     return false;
   }
 };
+
+export const removeBrowserStorage = (key: string): boolean => {
+  try {
+    localStorage.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
+};

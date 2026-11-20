@@ -1,48 +1,135 @@
-import { Moon, Sun } from 'lucide-solid';
-import { createSignal, onMount, Show } from 'solid-js';
+import { Monitor, Moon, Sun } from 'lucide-solid';
+import { createSignal, Match, onCleanup, onMount, Switch } from 'solid-js';
 
+import { Button } from '@/components/ui/button';
+import { interpolate } from '@/lib/i18n';
 import { useLanguage } from '@/lib/LanguageProvider';
-import { readBrowserStorage, writeBrowserStorage } from '@/lib/safe-storage';
+import {
+  readBrowserStorage,
+  removeBrowserStorage,
+  writeBrowserStorage,
+} from '@/lib/safe-storage';
 
 type Theme = 'dark' | 'light';
+type ThemePreference = 'system' | Theme;
 
-const getInitialTheme = (): Theme => {
-  const stored = readBrowserStorage('theme');
-  if (stored === 'dark' || stored === 'light') return stored;
-  return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+const THEME_COLORS: Record<Theme, string> = {
+  dark: '#0a0a0a',
+  light: '#ffffff',
 };
 
-export const [theme, setTheme] = createSignal<Theme>(getInitialTheme());
+const NEXT_PREFERENCE: Record<ThemePreference, ThemePreference> = {
+  dark: 'system',
+  light: 'dark',
+  system: 'light',
+};
 
-const applyTheme = (t: Theme) => {
-  document.documentElement.dataset['kbTheme'] = t;
-  writeBrowserStorage('theme', t);
+const darkQuery = () =>
+  typeof matchMedia === 'function'
+    ? matchMedia('(prefers-color-scheme: dark)')
+    : null;
+
+const getSystemTheme = (): Theme => (darkQuery()?.matches ? 'dark' : 'light');
+
+const getInitialPreference = (): ThemePreference => {
+  const stored = readBrowserStorage('theme');
+  return stored === 'dark' || stored === 'light' ? stored : 'system';
+};
+
+const resolveTheme = (value: ThemePreference): Theme =>
+  value === 'system' ? getSystemTheme() : value;
+
+const initialPreference = getInitialPreference();
+
+const [preference, setPreference] =
+  createSignal<ThemePreference>(initialPreference);
+
+export const [theme, setTheme] = createSignal<Theme>(
+  resolveTheme(initialPreference),
+);
+
+const applyTheme = (next: Theme) => {
+  setTheme(next);
+  const root = document.documentElement;
+  root.dataset['kbTheme'] = next;
+  root.style.colorScheme = next;
+  document
+    .querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', THEME_COLORS[next]);
+};
+
+const storePreference = (next: ThemePreference) => {
+  if (next === 'system') {
+    removeBrowserStorage('theme');
+    return;
+  }
+
+  writeBrowserStorage('theme', next);
 };
 
 export default function ThemeToggle() {
   const { t } = useLanguage();
+
   onMount(() => {
-    applyTheme(theme());
+    applyTheme(resolveTheme(preference()));
+
+    const query = darkQuery();
+    if (!query) return;
+
+    const onSystemChange = () => {
+      if (preference() === 'system') applyTheme(getSystemTheme());
+    };
+
+    query.addEventListener('change', onSystemChange);
+    onCleanup(() => {
+      query.removeEventListener('change', onSystemChange);
+    });
   });
 
-  const toggle = () => {
-    const next = theme() === 'dark' ? 'light' : 'dark';
-    setTheme(next);
-    applyTheme(next);
+  const cycle = () => {
+    const next = NEXT_PREFERENCE[preference()];
+    setPreference(next);
+    storePreference(next);
+    applyTheme(resolveTheme(next));
   };
 
+  const label = () =>
+    interpolate(t().themeToggle, {
+      mode: {
+        dark: t().themeDark,
+        light: t().themeLight,
+        system: t().themeSystem,
+      }[preference()],
+    });
+
   return (
-    <button
-      aria-label={t().themeToggle}
-      class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border border-input bg-background text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-      onClick={toggle}
+    <Button
+      aria-label={label()}
+      onClick={cycle}
+      size="icon"
+      title={label()}
+      variant="outline"
     >
-      <Show
-        fallback={<Moon class="h-4 w-4" />}
-        when={theme() === 'dark'}
-      >
-        <Sun class="h-4 w-4" />
-      </Show>
-    </button>
+      <Switch>
+        <Match when={preference() === 'system'}>
+          <Monitor
+            aria-hidden="true"
+            class="size-4"
+          />
+        </Match>
+        <Match when={preference() === 'dark'}>
+          <Moon
+            aria-hidden="true"
+            class="size-4"
+          />
+        </Match>
+        <Match when={preference() === 'light'}>
+          <Sun
+            aria-hidden="true"
+            class="size-4"
+          />
+        </Match>
+      </Switch>
+    </Button>
   );
 }
