@@ -1,11 +1,7 @@
 import { type JSX, Show } from 'solid-js';
 
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { formatNumber, formatPercentage } from '@/lib/format';
 import { interpolate } from '@/lib/i18n';
 import { useLanguage } from '@/lib/LanguageProvider';
@@ -22,76 +18,84 @@ type MentorsStatsCardsProps = {
   totalMentors: number;
 };
 
-type StatCardProps = {
-  description: string;
+type StatProps = {
+  class?: string;
   footer?: JSX.Element;
+  label: string;
   loading: boolean;
   value: JSX.Element;
 };
 
-const StatCard = (props: StatCardProps) => (
-  <Card>
-    <CardHeader class="px-4 sm:px-6">
-      <CardDescription>{props.description}</CardDescription>
-      <CardTitle class="text-2xl sm:text-3xl">
-        <Show
-          fallback="..."
-          when={!props.loading}
-        >
-          {props.value}
-        </Show>
-      </CardTitle>
-      {props.footer}
-    </CardHeader>
-  </Card>
+const Stat = (props: StatProps) => (
+  <div class={`flex flex-col gap-1 bg-card p-4 sm:px-5 ${props.class ?? ''}`}>
+    <dt class="text-xs text-muted-foreground sm:text-sm">{props.label}</dt>
+    <dd class="text-xl font-semibold tracking-tight tabular-nums sm:text-2xl">
+      <Show
+        fallback={<Skeleton class="my-1 h-6 w-16" />}
+        when={!props.loading}
+      >
+        {props.value}
+      </Show>
+    </dd>
+    <Show when={props.footer}>
+      <dd class="text-xs text-muted-foreground">{props.footer}</dd>
+    </Show>
+  </div>
 );
 
+// One compact card instead of five, so the list starts higher on the page,
+// especially on phones where the stats used to stack vertically.
 const MentorsStatsCards = (props: MentorsStatsCardsProps) => {
   const { language, t } = useLanguage();
   return (
-    <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-      <StatCard
-        description={t().totalMentors}
-        loading={props.loading}
-        value={formatNumber(props.totalMentors, language())}
-      />
-      <StatCard
-        description={t().sections[props.section].totalThesesLabel}
-        loading={props.loading}
-        value={formatNumber(props.totalDiplomas, language())}
-      />
-      <StatCard
-        description={t().average}
-        loading={props.loading}
-        value={formatNumber(
-          props.totalMentors > 0 ? props.totalDiplomas / props.totalMentors : 0,
-          language(),
-          { maximumFractionDigits: 1, minimumFractionDigits: 1 },
-        )}
-      />
-      <StatCard
-        description={t().median}
-        loading={props.loading}
-        value={formatNumber(props.median, language())}
-      />
-      <StatCard
-        description={t().topTenShare}
-        footer={
-          <CardDescription>
-            {interpolate(t().sections[props.section].topTenCount, {
-              shown: formatNumber(props.topTenDiplomasCount, language(), {
-                useGrouping: false,
-              }),
-              total: formatNumber(props.totalDiplomas, language(), {
-                useGrouping: false,
-              }),
-            })}
-          </CardDescription>
-        }
-        loading={props.loading}
-        value={formatPercentage(props.topTenMentorsShare, language())}
-      />
-    </div>
+    <Card class="mb-6 gap-0 overflow-hidden py-0">
+      <dl class="grid grid-cols-2 gap-px bg-border sm:grid-cols-3 lg:grid-cols-5">
+        <Stat
+          label={t().totalMentors}
+          loading={props.loading}
+          value={formatNumber(props.totalMentors, language())}
+        />
+        <Stat
+          label={t().sections[props.section].totalThesesLabel}
+          loading={props.loading}
+          value={formatNumber(props.totalDiplomas, language())}
+        />
+        <Stat
+          label={t().average}
+          loading={props.loading}
+          value={formatNumber(
+            props.totalMentors > 0
+              ? props.totalDiplomas / props.totalMentors
+              : 0,
+            language(),
+            { maximumFractionDigits: 1, minimumFractionDigits: 1 },
+          )}
+        />
+        <Stat
+          label={t().median}
+          loading={props.loading}
+          value={formatNumber(props.median, language())}
+        />
+        <Stat
+          class="col-span-2 lg:col-span-1"
+          footer={
+            <Show when={!props.loading}>
+              {interpolate(t().sections[props.section].topTenCount, {
+                shown: formatNumber(props.topTenDiplomasCount, language(), {
+                  useGrouping: false,
+                }),
+                total: formatNumber(props.totalDiplomas, language(), {
+                  useGrouping: false,
+                }),
+              })}
+            </Show>
+          }
+          label={t().topTenShare}
+          loading={props.loading}
+          value={formatPercentage(props.topTenMentorsShare, language())}
+        />
+      </dl>
+    </Card>
   );
 };
 

@@ -23,9 +23,11 @@ const MentorRow = (props: MentorListItemProps) => {
         class="cursor-pointer"
         onClick={props.onToggle}
       >
-        <TableCell class="text-center text-muted-foreground">
-          {formatNumber(props.index + 1, language())}
-        </TableCell>
+        <Show when={props.showRank}>
+          <TableCell class="text-center text-muted-foreground tabular-nums">
+            {formatNumber(props.index + 1, language())}
+          </TableCell>
+        </Show>
         <TableCell class="font-medium">
           <button
             aria-controls={props.expanded ? detailsId : undefined}
@@ -59,7 +61,7 @@ const MentorRow = (props: MentorListItemProps) => {
         <TableRow class="hover:bg-transparent">
           <TableCell
             class="p-0 whitespace-normal"
-            colSpan={3}
+            colSpan={props.showRank ? 3 : 2}
             id={detailsId}
           >
             <DiplomaDetailsTable
@@ -67,6 +69,7 @@ const MentorRow = (props: MentorListItemProps) => {
               getFileUrl={props.getFileUrl}
               getSearchAttemptId={props.getSearchAttemptId}
               getStatusInfo={props.getStatusInfo}
+              mentor={props.summary.mentor}
               section={props.section}
             />
           </TableCell>

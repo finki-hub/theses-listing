@@ -1,7 +1,10 @@
-import { For, Show } from 'solid-js';
+import { Link } from 'lucide-solid';
+import { For } from 'solid-js';
+import { toast } from 'solid-sonner';
 
 import type { Diploma } from '@/types';
 
+import { Button } from '@/components/ui/button';
 import DownloadButton from '@/features/mentors/components/mentors-list/DownloadButton.tsx';
 import { formatThesisDate } from '@/lib/format';
 import { useLanguage } from '@/lib/LanguageProvider';
@@ -18,6 +21,41 @@ const DateDisplay = (props: { value: string }) => {
   return <>{formatThesisDate(props.value, language())}</>;
 };
 
+const buildMentorLink = (mentor: string) => {
+  const params = new URLSearchParams({ mentor });
+  return `${location.origin}${location.pathname}?${params.toString()}`;
+};
+
+const CopyMentorLinkButton = (props: { mentor: string }) => {
+  const { t } = useLanguage();
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(buildMentorLink(props.mentor));
+      toast.success(t().linkCopied);
+    } catch {
+      toast.error(t().linkCopyError);
+    }
+  };
+
+  return (
+    <Button
+      class="h-8 px-2 text-muted-foreground"
+      onClick={() => {
+        void copy();
+      }}
+      size="sm"
+      variant="ghost"
+    >
+      <Link
+        aria-hidden="true"
+        class="size-4"
+      />
+      {t().copyMentorLink}
+    </Button>
+  );
+};
+
 const MobileDiplomaCard = (props: {
   diploma: Diploma;
   getFileUrl: (fileId: null | string) => null | string;
@@ -25,81 +63,51 @@ const MobileDiplomaCard = (props: {
   getStatusInfo: (status: string) => StatusInfo;
   section: 'diplomas' | 'masters';
 }) => {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
+  const url = () => props.getFileUrl(props.diploma.fileId);
   return (
-    <div class="overflow-hidden rounded-xl border border-border/60 bg-background/80 p-4 shadow-sm">
-      <div class="space-y-3 text-sm">
-        <div>
-          <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t().student}
-          </div>
-          <div
-            class="mt-1 wrap-break-word font-medium leading-5"
-            style={{ 'overflow-wrap': 'anywhere' }}
-          >
-            <HighlightedText
-              text={displayName(props.diploma.student, language())}
-            />
-          </div>
-        </div>
-        <div>
-          <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t().title}
-          </div>
-          <div
-            class="mt-1 wrap-break-word leading-5 text-foreground/90"
-            style={{ 'overflow-wrap': 'anywhere' }}
-          >
-            <HighlightedText text={props.diploma.title} />
-          </div>
-        </div>
-        <div class="grid gap-3 rounded-lg bg-muted/40 p-3">
-          <div class="min-w-0">
-            <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t().status}
-            </div>
-            <div class="mt-1">
-              <StatusBadge
-                info={props.getStatusInfo(props.diploma.status)}
-                section={props.section}
-                status={props.diploma.status}
-              />
-            </div>
-          </div>
-          <div class="min-w-0">
-            <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-              {t().date}
-            </div>
-            <div class="mt-1 wrap-break-word text-muted-foreground">
-              <DateDisplay value={props.diploma.dateOfSubmission} />
-            </div>
-          </div>
-          <Show when={props.diploma.fileId !== null}>
-            <div class="min-w-0">
-              <div class="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                {t().file}
-              </div>
-              <div class="mt-1">
-                <DownloadButton
-                  class="w-full bg-primary text-primary-foreground"
-                  getSearchAttemptId={props.getSearchAttemptId}
-                  section={props.section}
-                  url={props.getFileUrl(props.diploma.fileId)}
-                />
-              </div>
-            </div>
-          </Show>
-        </div>
+    <li class="space-y-2 py-3 text-sm first:pt-0 last:pb-0">
+      <div
+        class="font-medium leading-5"
+        style={{ 'overflow-wrap': 'anywhere' }}
+      >
+        <HighlightedText text={props.diploma.title} />
       </div>
-    </div>
+      <div
+        class="text-muted-foreground"
+        style={{ 'overflow-wrap': 'anywhere' }}
+      >
+        <HighlightedText
+          text={displayName(props.diploma.student, language())}
+        />
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="min-w-0 flex-1">
+          <StatusBadge
+            info={props.getStatusInfo(props.diploma.status)}
+            section={props.section}
+            status={props.diploma.status}
+          />
+        </div>
+        <span class="shrink-0 text-xs whitespace-nowrap text-muted-foreground tabular-nums">
+          <DateDisplay value={props.diploma.dateOfSubmission} />
+        </span>
+        <DownloadButton
+          class="-mr-1.5 shrink-0"
+          getSearchAttemptId={props.getSearchAttemptId}
+          section={props.section}
+          url={url()}
+        />
+      </div>
+    </li>
   );
 };
 
 const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
   const { language, t } = useLanguage();
   return (
-    <div class="bg-muted/30 px-3 py-3 sm:px-8 sm:py-4">
-      <div class="space-y-3 sm:hidden">
+    <div class="bg-muted/30 px-4 py-3 sm:px-8 sm:py-4">
+      <ul class="divide-y divide-border/60 sm:hidden">
         <For each={props.diplomas}>
           {(diploma) => (
             <MobileDiplomaCard
@@ -111,37 +119,37 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
             />
           )}
         </For>
-      </div>
+      </ul>
 
-      <table class="hidden w-full text-sm sm:table">
+      <table class="hidden w-full table-fixed text-sm sm:table">
         <thead>
           <tr class="border-b text-muted-foreground">
             <th
-              class="pb-2 pr-4 text-left font-medium"
+              class="w-[22%] pr-4 pb-2 text-left font-medium"
               scope="col"
             >
               {t().student}
             </th>
             <th
-              class="pb-2 pr-4 text-left font-medium"
+              class="pr-4 pb-2 text-left font-medium"
               scope="col"
             >
               {t().title}
             </th>
             <th
-              class="pb-2 pr-4 text-left font-medium"
+              class="w-[24%] pr-4 pb-2 text-left font-medium"
               scope="col"
             >
               {t().status}
             </th>
             <th
-              class="pb-2 pr-4 text-left font-medium"
+              class="w-28 pr-4 pb-2 text-left font-medium"
               scope="col"
             >
               {t().date}
             </th>
             <th
-              class="pb-2 text-left font-medium"
+              class="w-16 pb-2 text-center font-medium"
               scope="col"
             >
               {t().file}
@@ -151,15 +159,18 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
         <tbody>
           <For each={props.diplomas}>
             {(diploma) => (
-              <tr class="border-b border-border/50 last:border-0">
-                <td class="py-2 pr-4 whitespace-nowrap">
+              <tr class="border-b border-border/50 align-top last:border-0">
+                <td
+                  class="py-2.5 pr-4"
+                  style={{ 'overflow-wrap': 'anywhere' }}
+                >
                   <HighlightedText
                     text={displayName(diploma.student, language())}
                   />
                 </td>
                 <td
-                  class="max-w-xs py-2 pr-4 truncate"
-                  title={diploma.title}
+                  class="py-2.5 pr-4 leading-5"
+                  style={{ 'overflow-wrap': 'anywhere' }}
                 >
                   <HighlightedText text={diploma.title} />
                 </td>
@@ -170,10 +181,10 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
                     status={diploma.status}
                   />
                 </td>
-                <td class="py-2 pr-4 whitespace-nowrap text-muted-foreground">
+                <td class="py-2.5 pr-4 whitespace-nowrap text-muted-foreground tabular-nums">
                   <DateDisplay value={diploma.dateOfSubmission} />
                 </td>
-                <td class="py-2 text-center">
+                <td class="py-1.5 text-center">
                   <DownloadButton
                     getSearchAttemptId={props.getSearchAttemptId}
                     section={props.section}
@@ -185,6 +196,10 @@ const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
           </For>
         </tbody>
       </table>
+
+      <div class="mt-2 flex justify-end border-t border-border/50 pt-2">
+        <CopyMentorLinkButton mentor={props.mentor} />
+      </div>
     </div>
   );
 };

@@ -73,8 +73,8 @@ describe('localization', () => {
       expect(interpolate(t.lastUpdated, { date: 'test date' })).toContain(
         'test date',
       );
-      expect(interpolate(t.staleUpdated, { date: 'test date' })).toContain(
-        'test date',
+      expect(interpolate(t.statusStep, { step: 3, total: 9 })).not.toContain(
+        '{',
       );
     }
   });
