@@ -159,6 +159,8 @@ test('filters by a year from the chart and profiles a mentor', async ({
     await chartToggle.click();
 
   const bar = page.getByRole('button', { name: '2019: 2' });
+  await bar.hover();
+  await expect(page.getByText('0% vs 2018')).toBeVisible();
   await bar.click();
 
   await expect(bar).toHaveAttribute('aria-pressed', 'true');

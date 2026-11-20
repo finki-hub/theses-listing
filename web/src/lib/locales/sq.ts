@@ -94,6 +94,7 @@ export const sq = {
   topTenShare: 'Pjesa e 10 mentorëve kryesorë',
   totalMentors: 'Gjithsej mentorë',
   year: 'Viti',
+  yearChange: '{change} krahasuar me {year}',
   yearChartHint: 'Zgjidhni një vit për të filtruar listën.',
   yearRecent: '30 ditët e fundit',
   yearSoFar: '{year} (deri tani)',

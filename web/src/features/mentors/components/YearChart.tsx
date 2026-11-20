@@ -46,7 +46,12 @@ const partialYearStyle = {
     'repeating-linear-gradient(135deg, transparent 0 3px, hsl(var(--card) / 0.45) 3px 6px)',
 };
 
-const Tooltip = (props: { count: number; entry: YearCount; index: number }) => {
+const Tooltip = (props: {
+  count: number;
+  entry: YearCount;
+  index: number;
+  previous: undefined | YearCount;
+}) => {
   const { language, t } = useLanguage();
   const labels = (): Record<StatusTone, string> => ({
     cancelled: t().statusCancelled,
@@ -73,9 +78,37 @@ const Tooltip = (props: { count: number; entry: YearCount; index: number }) => {
           ? interpolate(t().yearSoFar, { year: props.entry.year })
           : props.entry.year}
       </div>
-      <div class="mb-1 text-base font-semibold tabular-nums">
+      <div class="text-base font-semibold tabular-nums">
         {formatNumber(props.entry.total, language())}
       </div>
+      {/* Not for the current year: a partial count against a full year
+          would read as a drop. */}
+      <Show
+        when={
+          props.entry.year !== currentYear &&
+          props.previous !== undefined &&
+          props.previous.total > 0 &&
+          props.previous
+        }
+      >
+        {(previous) => (
+          <div class="text-muted-foreground tabular-nums">
+            {interpolate(t().yearChange, {
+              change: formatNumber(
+                props.entry.total / previous().total - 1,
+                language(),
+                {
+                  maximumFractionDigits: 0,
+                  signDisplay: 'exceptZero',
+                  style: 'percent',
+                },
+              ),
+              year: previous().year,
+            })}
+          </div>
+        )}
+      </Show>
+      <div class="mb-1" />
       <For each={TONES.filter((tone) => props.entry.byTone[tone] > 0)}>
         {(tone) => (
           <div class="flex items-center gap-1.5 text-muted-foreground">
@@ -182,6 +215,7 @@ const Plot = (props: YearChartProps) => {
                     count={count()}
                     entry={entry()}
                     index={index()}
+                    previous={props.stats.years[index() - 1]}
                   />
                 )}
               </Show>
