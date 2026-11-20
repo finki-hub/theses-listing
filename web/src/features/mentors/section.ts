@@ -75,6 +75,25 @@ export const getStatusInfo = (
   return { maxStage: config.maxStatusStage, stage, tone };
 };
 
+// Many theses share a status, so resolve each distinct status's tone once.
+export const createStatusToneResolver = (
+  config: Pick<
+    SectionConfig,
+    'getStatusStage' | 'isComplete' | 'maxStatusStage'
+  >,
+) => {
+  const cache = new Map<string, StatusTone>();
+  return (status: string): StatusTone => {
+    let tone = cache.get(status);
+    if (tone === undefined) {
+      tone = getStatusInfo(config, status).tone;
+      cache.set(status, tone);
+    }
+
+    return tone;
+  };
+};
+
 export const DIPLOMAS_SECTION: SectionConfig = {
   basePath: '/',
   fetchTheses: fetchDiplomas,

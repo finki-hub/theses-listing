@@ -3,7 +3,7 @@ import type { Diploma, MentorSummary } from '@/types';
 import { type Language, languageLocales } from '@/lib/i18n';
 import { matchesStatusSearch } from '@/lib/statuses';
 
-import type { SectionId } from './section';
+import type { SectionId, StatusTone } from './section';
 import type { FilteredMentorSummary, SortDirection, SortField } from './types';
 
 import {
@@ -15,21 +15,45 @@ import {
 
 const collator = new Intl.Collator();
 
+// The status filter holds either an exact status or a whole state such as
+// "tone:progress", so state filters share the URL param, "clear filters" and
+// analytics with the detailed status filter.
+export const TONE_FILTER_PREFIX = 'tone:';
+
+export const FILTERABLE_TONES = ['progress', 'complete', 'cancelled'] as const;
+
+export const toneFilterValue = (tone: StatusTone) =>
+  `${TONE_FILTER_PREFIX}${tone}`;
+
+export const parseToneFilter = (value: string): null | StatusTone => {
+  if (!value.startsWith(TONE_FILTER_PREFIX)) return null;
+  const tone = value.slice(TONE_FILTER_PREFIX.length);
+  return (FILTERABLE_TONES as readonly string[]).includes(tone)
+    ? (tone as StatusTone)
+    : null;
+};
+
 type FilterOptions = {
+  getStatusTone: (status: string) => StatusTone;
   query: string;
   section: SectionId;
   selectedStatus: string;
+  selectedTone: null | StatusTone;
   selectedYear: string;
 };
+
+const matchesStatusFilter = (diploma: Diploma, options: FilterOptions) =>
+  options.selectedTone === null
+    ? options.selectedStatus.length === 0 ||
+      diploma.status === options.selectedStatus
+    : options.getStatusTone(diploma.status) === options.selectedTone;
 
 const matchesDiploma = (
   diploma: Diploma,
   options: FilterOptions,
   mentorMatches: boolean,
 ): boolean => {
-  const matchesStatus =
-    options.selectedStatus.length === 0 ||
-    diploma.status === options.selectedStatus;
+  const matchesStatus = matchesStatusFilter(diploma, options);
   const matchesYear =
     options.selectedYear.length === 0 ||
     getSubmissionYear(diploma.dateOfSubmission) === options.selectedYear;
@@ -74,6 +98,7 @@ const compareSummaries = (
 };
 
 export const buildFilteredSummaries = (options: {
+  getStatusTone?: (status: string) => StatusTone;
   language?: Language;
   query: string;
   section?: SectionId;
@@ -86,9 +111,11 @@ export const buildFilteredSummaries = (options: {
   const normalizedQuery = normalizeSearchText(options.query);
 
   const filterOptions: FilterOptions = {
+    getStatusTone: options.getStatusTone ?? (() => 'unknown'),
     query: normalizedQuery,
     section: options.section ?? 'diplomas',
     selectedStatus: options.selectedStatus,
+    selectedTone: parseToneFilter(options.selectedStatus),
     selectedYear: options.selectedYear,
   };
 
@@ -122,6 +149,27 @@ export const buildFilteredSummaries = (options: {
       sortField: options.sortField,
     }),
   );
+};
+
+// Theses per state, used for the state filter chip counts.
+export const countByTone = (
+  summaries: FilteredMentorSummary[],
+  getStatusTone: (status: string) => StatusTone,
+): Record<StatusTone, number> => {
+  const counts: Record<StatusTone, number> = {
+    cancelled: 0,
+    complete: 0,
+    progress: 0,
+    unknown: 0,
+  };
+
+  for (const summary of summaries) {
+    for (const diploma of summary.filteredDiplomas) {
+      counts[getStatusTone(diploma.status)] += 1;
+    }
+  }
+
+  return counts;
 };
 
 export const buildStatusOptions = (

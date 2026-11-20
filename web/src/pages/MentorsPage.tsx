@@ -59,6 +59,11 @@ export default function MentorsPage(props: MentorsPageProps) {
           totalDiplomas={state.totalDiplomasCount()}
           totalMentors={state.totalMentorsCount()}
         />
+        <Show when={state.hasActiveFilters()}>
+          <p class="-mt-4 mb-6 text-xs text-muted-foreground">
+            {t().statsUnfiltered}
+          </p>
+        </Show>
 
         <Card class="overflow-hidden">
           <CardHeader class="px-4 sm:px-6">
@@ -79,6 +84,7 @@ export default function MentorsPage(props: MentorsPageProps) {
               setYearFilter={state.setYearFilter}
               statusFilter={state.statusFilter()}
               statusOptions={state.statusOptions()}
+              toneCounts={state.toneCounts()}
               totalDiplomasCount={state.totalDiplomasCount()}
               totalMentorsCount={state.totalMentorsCount()}
               yearFilter={state.yearFilter()}

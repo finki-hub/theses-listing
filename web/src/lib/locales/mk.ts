@@ -70,10 +70,13 @@ export const mk = {
   sortMentor: 'По ментор',
   staleWarning:
     'Последното освежување не успеа, па податоците можеби не се најнови.',
+  statsUnfiltered: 'Статистиката ги опфаќа сите трудови, без филтрите подолу.',
   status: 'Статус',
   statusCancelled: 'Откажано',
   statusComplete: 'Завршено',
+  statusDetailed: 'Детален статус',
   statusInProgress: 'Во тек',
+  statusState: 'Состојба',
   statusStep: 'Чекор {step} од {total}',
   student: 'Студент',
   themeDark: 'Темна',

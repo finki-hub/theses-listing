@@ -23,6 +23,7 @@ import {
   syncMentorsSearchParams,
 } from '../query-state';
 import {
+  createStatusToneResolver,
   getStatusInfo as getSectionStatusInfo,
   type SectionConfig,
 } from '../section';
@@ -32,6 +33,7 @@ import {
   buildYearOptions,
   calculateMedianDiplomas,
   calculateTopMentorsDiplomaCount,
+  countByTone,
 } from '../selectors';
 import { aggregateByMentor } from '../utils';
 import { createMentorExpansion } from './createMentorExpansion';
@@ -135,8 +137,10 @@ export const useMentorsPageState = (
     const data = diplomas();
     return data ? aggregateByMentor(data) : [];
   });
+  const getStatusTone = createStatusToneResolver(config);
   const filteredSummaries = createMemo(() =>
     buildFilteredSummaries({
+      getStatusTone,
       language: sortField() === 'mentor' ? language() : 'mk',
       query: search(),
       section: config.id,
@@ -153,6 +157,23 @@ export const useMentorsPageState = (
     filteredSummaries().reduce(
       (total, summary) => total + summary.filteredDiplomas.length,
       0,
+    ),
+  );
+  // Theses per state under the current search and year, ignoring the status
+  // filter itself, so the chips show what selecting them would yield.
+  const toneCounts = createMemo(() =>
+    countByTone(
+      buildFilteredSummaries({
+        getStatusTone,
+        query: search(),
+        section: config.id,
+        selectedStatus: '',
+        selectedYear: yearFilter(),
+        sortDirection: 'desc',
+        sortField: 'totalDiplomas',
+        summaries: mentorSummaries(),
+      }),
+      getStatusTone,
     ),
   );
   const statusOptions = createMemo(() =>
@@ -270,6 +291,7 @@ export const useMentorsPageState = (
     statusFilter,
     statusOptions,
     toggleExpanded,
+    toneCounts,
     topTenDiplomasCount,
     topTenMentorsShare,
     totalDiplomasCount,
