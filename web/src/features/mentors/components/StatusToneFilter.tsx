@@ -25,8 +25,10 @@ const dotClasses: Record<StatusTone, string> = {
   unknown: 'bg-muted-foreground',
 };
 
+// Phones: a 3-column segmented control with the count under the label, so
+// all states fit on one row in every language. sm and up: inline pills.
 const chipClass =
-  'inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full border px-3 text-sm ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2';
+  'flex min-w-0 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-lg border px-1.5 py-1.5 text-xs leading-tight ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:h-8 sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-3 sm:py-0 sm:text-sm';
 
 // Quick filter by overall state; detailed statuses stay in the dropdown.
 const StatusToneFilter = (props: StatusToneFilterProps) => {
@@ -40,7 +42,7 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
   });
 
   return (
-    <fieldset class="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0">
+    <fieldset class="m-0 grid min-w-0 grid-cols-3 gap-1.5 border-0 p-0 sm:flex sm:flex-wrap sm:gap-2">
       <legend class="sr-only">{t().statusState}</legend>
       <For each={FILTERABLE_TONES}>
         {(tone) => {
@@ -60,12 +62,14 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
               }}
               type="button"
             >
-              <span
-                aria-hidden="true"
-                class={cn('size-2 rounded-full', dotClasses[tone])}
-              />
-              {labels()[tone]}
-              <span class="text-xs tabular-nums text-muted-foreground">
+              <span class="flex max-w-full items-center justify-center gap-1.5">
+                <span
+                  aria-hidden="true"
+                  class={cn('size-2 shrink-0 rounded-full', dotClasses[tone])}
+                />
+                <span class="min-w-0 text-center">{labels()[tone]}</span>
+              </span>
+              <span class="text-[0.6875rem] tabular-nums text-muted-foreground sm:text-xs">
                 {formatNumber(props.counts[tone], language())}
               </span>
             </button>
