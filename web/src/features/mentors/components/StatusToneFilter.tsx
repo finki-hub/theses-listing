@@ -40,11 +40,8 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
   });
 
   return (
-    <div
-      aria-label={t().statusState}
-      class="flex flex-wrap gap-2"
-      role="group"
-    >
+    <fieldset class="m-0 flex min-w-0 flex-wrap gap-2 border-0 p-0">
+      <legend class="sr-only">{t().statusState}</legend>
       <For each={FILTERABLE_TONES}>
         {(tone) => {
           const active = () => selectedTone() === tone;
@@ -75,7 +72,7 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
           );
         }}
       </For>
-    </div>
+    </fieldset>
   );
 };
 
