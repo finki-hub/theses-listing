@@ -27,6 +27,14 @@ npm test
 npm run build
 ```
 
+Browser smoke tests (Playwright, against mocked catalogs):
+
+```sh
+cd web
+npx playwright install chromium
+npm run test:e2e
+```
+
 ## License
 
 This project is licensed under the terms of the MIT license.

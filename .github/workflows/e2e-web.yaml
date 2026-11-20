@@ -1,0 +1,51 @@
+name: E2E Web
+
+on:
+  push:
+    branches: [main, dev]
+    paths: [web/**, package-lock.json, .github/workflows/e2e-web.yaml]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths: [web/**, package-lock.json, .github/workflows/e2e-web.yaml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-web-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: Playwright
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        working-directory: web
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Smoke Tests
+        working-directory: web
+        run: npm run test:e2e
+
+      - name: Upload Traces
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: web/test-results/
+          retention-days: 7
