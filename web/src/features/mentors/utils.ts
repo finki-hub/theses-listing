@@ -41,6 +41,52 @@ export const countCommitteeSeats = (
   return counts;
 };
 
+// Days since 1970-01-01 for a civil date (Howard Hinnant's algorithm), so
+// dates compare as plain numbers without Date objects or time zones.
+const toDayNumber = (year: number, month: number, day: number) => {
+  const shifted = month <= 2 ? year - 1 : year;
+  const era = Math.floor(shifted / 400);
+  const yearOfEra = shifted - era * 400;
+  const dayOfYear =
+    Math.floor((153 * (month + (month > 2 ? -3 : 9)) + 2) / 5) + day - 1;
+  const dayOfEra =
+    yearOfEra * 365 +
+    Math.floor(yearOfEra / 4) -
+    Math.floor(yearOfEra / 100) +
+    dayOfYear;
+  return era * 146_097 + dayOfEra - 719_468;
+};
+
+// "DD.MM.YYYY" (optionally followed by a time) as a day number.
+export const getSubmissionDay = (value: string): null | number => {
+  const datePart = value.trim().split(WHITESPACE_REGEX, 1)[0] ?? '';
+  const [day, month, year] = datePart.split('.').map(Number);
+  return day === undefined ||
+    month === undefined ||
+    year === undefined ||
+    !Number.isSafeInteger(day) ||
+    !Number.isSafeInteger(month) ||
+    !Number.isSafeInteger(year) ||
+    month < 1 ||
+    month > 12 ||
+    day < 1 ||
+    day > 31
+    ? null
+    : toDayNumber(year, month, day);
+};
+
+// Today in the reader's time zone, as a day number.
+export const getTodayDay = (): number => {
+  const parts = new Intl.DateTimeFormat('en', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+  }).formatToParts();
+  const part = (type: string) =>
+    Number(parts.find((entry) => entry.type === type)?.value);
+  return toDayNumber(part('year'), part('month'), part('day'));
+};
+
 export const getSubmissionYear = (value: string): null | string => {
   // Masters dates carry a time suffix ("03.07.2026 11:00"); the year lives in
   // the leading date token.

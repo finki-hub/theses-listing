@@ -90,6 +90,7 @@ export const en = {
   totalMentors: 'Total mentors',
   year: 'Year',
   yearChartHint: 'Select a year to filter the list.',
+  yearRecent: 'Last 30 days',
   yearSoFar: '{year} (so far)',
   yearUndated: 'Without a date: {count}',
 } as const;

@@ -10,7 +10,7 @@ import { getStatusLabel } from '@/lib/statuses';
 
 import type { SectionId, StatusTone } from '../section';
 
-import { FILTERABLE_TONES, toneFilterValue } from '../selectors';
+import { FILTERABLE_TONES, RECENT_FILTER, toneFilterValue } from '../selectors';
 import MentorsSearchInput from './MentorsSearchInput';
 import StatusToneFilter from './StatusToneFilter';
 
@@ -122,6 +122,12 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
                 value=""
               >
                 {t().allYears}
+              </option>
+              <option
+                selected={props.yearFilter === RECENT_FILTER}
+                value={RECENT_FILTER}
+              >
+                {t().yearRecent}
               </option>
               <For each={props.yearOptions}>
                 {(year) => (

@@ -96,6 +96,7 @@ export const tr = {
   totalMentors: 'Toplam danışman',
   year: 'Yıl',
   yearChartHint: 'Listeyi filtrelemek için bir yıl seçin.',
+  yearRecent: 'Son 30 gün',
   yearSoFar: '{year} (şu ana kadar)',
   yearUndated: 'Tarihsiz: {count}',
 } as const satisfies Translations;

@@ -96,6 +96,7 @@ export const mk = {
   totalMentors: 'Вкупно ментори',
   year: 'Година',
   yearChartHint: 'Изберете година за да ја филтрирате листата.',
+  yearRecent: 'Последни 30 дена',
   yearSoFar: '{year} (досега)',
   yearUndated: 'Без датум: {count}',
 } as const satisfies Translations;

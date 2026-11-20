@@ -12,6 +12,7 @@ import { readBrowserStorage, writeBrowserStorage } from '@/lib/safe-storage';
 
 import type { StatusTone } from '../section';
 
+import { RECENT_FILTER } from '../selectors';
 import { niceAxisMax, type YearCount, type YearStats } from '../year-stats';
 import { toneDotClasses } from './StatusToneFilter';
 
@@ -135,8 +136,11 @@ const Plot = (props: YearChartProps) => {
             <For each={props.stats.years}>
               {(entry, index) => {
                 const selected = () => props.selectedYear === entry.year;
+                // "Last 30 days" isn't a bar, so it dims nothing.
                 const dimmed = () =>
-                  props.selectedYear.length > 0 && !selected();
+                  props.selectedYear.length > 0 &&
+                  props.selectedYear !== RECENT_FILTER &&
+                  !selected();
                 return (
                   <button
                     aria-label={`${entry.year === currentYear ? interpolate(t().yearSoFar, { year: entry.year }) : entry.year}: ${formatNumber(entry.total, language())}`}

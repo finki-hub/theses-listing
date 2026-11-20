@@ -8,7 +8,9 @@ import type { FilteredMentorSummary, SortDirection, SortField } from './types';
 
 import {
   displayName,
+  getSubmissionDay,
   getSubmissionYear,
+  getTodayDay,
   matchesNormalizedSearch,
   normalizeSearchText,
 } from './utils';
@@ -33,6 +35,10 @@ export const parseToneFilter = (value: string): null | StatusTone => {
     : null;
 };
 
+// The year filter's special value: theses from the last RECENT_DAYS days.
+export const RECENT_FILTER = 'recent';
+export const RECENT_DAYS = 30;
+
 type FilterOptions = {
   getStatusTone: (status: string) => StatusTone;
   query: string;
@@ -40,6 +46,17 @@ type FilterOptions = {
   selectedStatus: string;
   selectedTone: null | StatusTone;
   selectedYear: string;
+  today: number;
+};
+
+const matchesYearFilter = (diploma: Diploma, options: FilterOptions) => {
+  if (options.selectedYear.length === 0) return true;
+  if (options.selectedYear !== RECENT_FILTER)
+    return getSubmissionYear(diploma.dateOfSubmission) === options.selectedYear;
+
+  const day = getSubmissionDay(diploma.dateOfSubmission);
+  // Future-dated entries (scheduled defenses) count as recent too.
+  return day !== null && day > options.today - RECENT_DAYS;
 };
 
 const matchesStatusFilter = (diploma: Diploma, options: FilterOptions) =>
@@ -54,9 +71,7 @@ const matchesDiploma = (
   mentorMatches: boolean,
 ): boolean => {
   const matchesStatus = matchesStatusFilter(diploma, options);
-  const matchesYear =
-    options.selectedYear.length === 0 ||
-    getSubmissionYear(diploma.dateOfSubmission) === options.selectedYear;
+  const matchesYear = matchesYearFilter(diploma, options);
   const matchesSearch =
     options.query.length === 0 ||
     mentorMatches ||
@@ -70,7 +85,9 @@ const matchesDiploma = (
 };
 
 type CompareOptions = {
-  hasQuery: boolean;
+  // With any filter, count sorts rank by the matching theses, so a year
+  // filter ranks mentors by that year's theses.
+  hasFilters: boolean;
   language: Language;
   sortDirection: SortDirection;
   sortField: SortField;
@@ -90,7 +107,7 @@ const compareSummaries = (
     );
   } else {
     const countOf = (summary: FilteredMentorSummary) =>
-      options.hasQuery
+      options.hasFilters
         ? summary.filteredDiplomas.length
         : summary.totalDiplomas;
     comparison =
@@ -114,6 +131,7 @@ export const buildFilteredSummaries = (options: {
   sortDirection: SortDirection;
   sortField: SortField;
   summaries: MentorSummary[];
+  today?: number;
 }): FilteredMentorSummary[] => {
   const normalizedQuery = normalizeSearchText(options.query);
 
@@ -124,6 +142,7 @@ export const buildFilteredSummaries = (options: {
     selectedStatus: options.selectedStatus,
     selectedTone: parseToneFilter(options.selectedStatus),
     selectedYear: options.selectedYear,
+    today: options.today ?? getTodayDay(),
   };
 
   const results = options.summaries
@@ -154,7 +173,10 @@ export const buildFilteredSummaries = (options: {
 
   return results.toSorted((a, b) =>
     compareSummaries(a, b, {
-      hasQuery: options.query.length > 0,
+      hasFilters:
+        options.query.length > 0 ||
+        options.selectedStatus.length > 0 ||
+        options.selectedYear.length > 0,
       language: options.language ?? 'mk',
       sortDirection: options.sortDirection,
       sortField: options.sortField,
