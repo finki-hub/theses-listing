@@ -10,7 +10,7 @@ import type { FilteredMentorSummary } from '../types';
 
 // When a search matches theses rather than mentor names, the first few
 // matching mentors open automatically so the matching theses are visible.
-export const AUTO_EXPAND_LIMIT = 5;
+const AUTO_EXPAND_LIMIT = 5;
 const AUTO_EXPAND_DELAY_MS = 300;
 
 type MentorExpansionOptions = {
@@ -36,6 +36,10 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
   createEffect(() => {
     const query = options.search();
     const timer = setTimeout(() => {
+      // Only a changed query clears dismissals; the initial run must not undo
+      // a collapse made right after loading a shared ?q= link.
+      if (query === settledSearch()) return;
+
       setSettledSearch(query);
       setDismissedAuto([]);
     }, AUTO_EXPAND_DELAY_MS);

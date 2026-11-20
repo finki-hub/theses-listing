@@ -178,6 +178,20 @@ const defineSearchAndSelectionTests = () => {
     expect(replaceState.mock.calls.at(-1)?.[2]).toContain('mentor=Other');
   });
 
+  it('keeps a mentor closed when it is collapsed right after loading a search link', async () => {
+    vi.useFakeTimers();
+    stubBrowserLocation('?q=Student');
+    const state = createTestState(() =>
+      Promise.resolve(createCatalogResult([DIPLOMA])),
+    );
+    await vi.advanceTimersByTimeAsync(0);
+    expect(state.expandedMentors()).toEqual(['Mentor']);
+
+    state.toggleExpanded('Mentor');
+    await vi.advanceTimersByTimeAsync(300);
+    expect(state.isExpanded('Mentor')).toBe(false);
+  });
+
   it('waits for data, handles zero results and cancels cleared searches', async () => {
     vi.useFakeTimers();
     stubBrowserLocation('?q=Student');

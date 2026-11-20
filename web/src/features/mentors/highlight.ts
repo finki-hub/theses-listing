@@ -42,7 +42,14 @@ export const findHighlightRanges = (
   query: string,
 ): HighlightRange[] => {
   const normalizedQuery = normalizeSearchText(query);
-  if (normalizedQuery.length === 0 || text.length === 0) return [];
+  // Cheap check first, and it keeps highlighting in sync with what the search
+  // itself considers a match.
+  if (
+    normalizedQuery.length === 0 ||
+    !normalizeSearchText(text).includes(normalizedQuery)
+  ) {
+    return [];
+  }
 
   const { normalized, sourceIndex } = buildNormalizedIndex(text);
   const ranges: HighlightRange[] = [];

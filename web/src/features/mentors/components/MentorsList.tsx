@@ -87,9 +87,9 @@ const MentorsList = (props: MentorsListProps) => (
         <TableBody>
           <Show
             fallback={
-              <TableRow>
+              <TableRow class="hover:bg-transparent">
                 <TableCell
-                  class="whitespace-normal hover:bg-transparent"
+                  class="whitespace-normal"
                   colSpan={3}
                 >
                   <EmptyState

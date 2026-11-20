@@ -27,6 +27,15 @@ describe('findHighlightRanges', () => {
     ).toEqual(['Web-апликација  за']);
   });
 
+  it('maps characters outside the Basic Multilingual Plane back correctly', () => {
+    expect(highlighted('😀 Blockchain за 𝔸 учење', 'учење')).toEqual(['учење']);
+    expect(highlighted('😀 Blockchain', 'blockchain')).toEqual(['Blockchain']);
+  });
+
+  it('applies the same dj/gj folding as the search', () => {
+    expect(highlighted('Djordje', 'gjor')).toEqual(['Djor']);
+  });
+
   it('returns nothing for an empty query or no match', () => {
     expect(findHighlightRanges('Наслов', '')).toEqual([]);
     expect(findHighlightRanges('Наслов', '  ')).toEqual([]);
