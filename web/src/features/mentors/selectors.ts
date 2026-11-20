@@ -102,7 +102,11 @@ export const buildFilteredSummaries = (options: {
 
       return matchingDiplomas.length === 0
         ? null
-        : { ...summary, filteredDiplomas: matchingDiplomas };
+        : {
+            ...summary,
+            filteredDiplomas: matchingDiplomas,
+            matchedByMentor: normalizedQuery.length > 0 && mentorMatches,
+          };
     })
     .filter(
       (summary): summary is NonNullable<typeof summary> => summary !== null,

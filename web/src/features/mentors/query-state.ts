@@ -27,14 +27,20 @@ export const getInitialMentorsPageState = (
       ? sortDirection
       : defaultDirectionForField;
 
-  const expandedMentor = params.get('mentor')?.trim();
+  const expandedMentors = [
+    ...new Set(
+      params
+        .getAll('mentor')
+        .map((mentor) => mentor.trim())
+        .filter((mentor) => mentor.length > 0),
+    ),
+  ];
   const search = params.get('q')?.trim();
   const statusFilter = params.get('status')?.trim();
   const yearFilter = params.get('year')?.trim();
 
   return {
-    expandedMentor:
-      expandedMentor && expandedMentor.length > 0 ? expandedMentor : null,
+    expandedMentors,
     search: search ?? '',
     sortDirection: nextSortDirection,
     sortField: nextSortField,
@@ -44,7 +50,7 @@ export const getInitialMentorsPageState = (
 };
 
 export const syncMentorsSearchParams = (options: {
-  expandedMentor: null | string;
+  expandedMentors: readonly string[];
   search: string;
   sortDirection: SortDirection;
   sortField: SortField;
@@ -76,8 +82,8 @@ export const syncMentorsSearchParams = (options: {
     params.set('dir', options.sortDirection);
   }
 
-  if (options.expandedMentor) {
-    params.set('mentor', options.expandedMentor);
+  for (const mentor of options.expandedMentors) {
+    params.append('mentor', mentor);
   }
 
   const nextSearch = params.toString();

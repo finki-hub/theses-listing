@@ -45,7 +45,7 @@ describe('localization', () => {
       const state = getInitialMentorsPageState('');
       expect(state.search).toBe('');
       expect(state.statusFilter).toBe('');
-      expect(state.expandedMentor).toBeNull();
+      expect(state.expandedMentors).toEqual([]);
       expect(getInitialMentorsPageState('?q=Savunma').search).toBe('Savunma');
     } finally {
       vi.unstubAllGlobals();

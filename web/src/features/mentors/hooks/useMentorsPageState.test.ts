@@ -89,7 +89,7 @@ const defineSearchAndSelectionTests = () => {
       expect(state.search()).toBe('Defended');
       expect(state.statusFilter()).toBe(diploma.status);
       expect(state.yearFilter()).toBe('2026');
-      expect(state.expandedMentor()).toBe(mentor);
+      expect(state.expandedMentors()).toEqual([mentor]);
       expect(state.filteredDiplomasCount()).toBe(1);
       expect(state.diplomas()).toEqual([diploma]);
     }
@@ -108,9 +108,11 @@ const defineSearchAndSelectionTests = () => {
     );
     await vi.advanceTimersByTimeAsync(0);
     vi.mocked(captureAnalytics).mockClear();
-    state.setSearch('Stud');
+    // Match the mentor's name: thesis-only matches auto-expand (covered in
+    // the auto-expansion test), which would turn this toggle into a collapse.
+    state.setSearch('Ment');
     await vi.advanceTimersByTimeAsync(300);
-    state.setSearch('Student');
+    state.setSearch('Mentor');
     await vi.advanceTimersByTimeAsync(499);
     expect(captureAnalytics).not.toHaveBeenCalled();
     await vi.advanceTimersByTimeAsync(1);
@@ -129,7 +131,7 @@ const defineSearchAndSelectionTests = () => {
       section: 'diplomas',
     });
     state.toggleExpanded('Mentor');
-    state.setSearch('Stu');
+    state.setSearch('Men');
     state.toggleExpanded('Mentor');
     expect(captureAnalytics).toHaveBeenLastCalledWith('result_clicked', {
       position: 0,
@@ -137,7 +139,7 @@ const defineSearchAndSelectionTests = () => {
     });
     expect(
       JSON.stringify(vi.mocked(captureAnalytics).mock.calls),
-    ).not.toContain('Student');
+    ).not.toContain('Ment');
     expect(
       JSON.stringify(vi.mocked(captureAnalytics).mock.calls),
     ).not.toContain('Mentor');
@@ -145,6 +147,49 @@ const defineSearchAndSelectionTests = () => {
     const count = vi.mocked(captureAnalytics).mock.calls.length;
     await vi.advanceTimersByTimeAsync(1_000);
     expect(captureAnalytics).toHaveBeenCalledTimes(count);
+  });
+
+  it('auto-expands thesis-only matches, lets users close them and keeps them out of the URL', async () => {
+    vi.useFakeTimers();
+    const replaceState = stubBrowserLocation('');
+    const other = { ...DIPLOMA, mentor: 'Other', student: 'Someone' };
+    const state = createTestState(() =>
+      Promise.resolve(createCatalogResult([DIPLOMA, other])),
+    );
+    await vi.advanceTimersByTimeAsync(0);
+
+    state.setSearch('Student');
+    expect(state.expandedMentors()).toEqual([]);
+    await vi.advanceTimersByTimeAsync(300);
+    expect(state.expandedMentors()).toEqual(['Mentor']);
+    expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=');
+
+    state.toggleExpanded('Mentor');
+    expect(state.isExpanded('Mentor')).toBe(false);
+
+    state.setSearch('Other');
+    await vi.advanceTimersByTimeAsync(300);
+    expect(state.expandedMentors()).toEqual([]);
+
+    state.toggleExpanded('Other');
+    state.setSearch('');
+    await vi.advanceTimersByTimeAsync(300);
+    expect(state.expandedMentors()).toEqual(['Other']);
+    expect(replaceState.mock.calls.at(-1)?.[2]).toContain('mentor=Other');
+  });
+
+  it('keeps a mentor closed when it is collapsed right after loading a search link', async () => {
+    vi.useFakeTimers();
+    stubBrowserLocation('?q=Student');
+    const state = createTestState(() =>
+      Promise.resolve(createCatalogResult([DIPLOMA])),
+    );
+    await vi.advanceTimersByTimeAsync(0);
+    expect(state.expandedMentors()).toEqual(['Mentor']);
+
+    state.toggleExpanded('Mentor');
+    await vi.advanceTimersByTimeAsync(300);
+    expect(state.isExpanded('Mentor')).toBe(false);
   });
 
   it('waits for data, handles zero results and cancels cleared searches', async () => {
@@ -411,7 +456,7 @@ const defineCleanupAndRetainedSelectionTests = () => {
     await state.refetchDiplomas();
 
     // Then
-    expect(state.expandedMentor()).toBe('Mentor');
+    expect(state.expandedMentors()).toEqual(['Mentor']);
     expect(fetchTheses).toHaveBeenCalledTimes(2);
   });
 

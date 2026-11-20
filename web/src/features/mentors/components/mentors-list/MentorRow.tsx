@@ -8,6 +8,7 @@ import { useLanguage } from '@/lib/LanguageProvider';
 import type { MentorListItemProps } from './types';
 
 import { displayName } from '../../utils';
+import HighlightedText from '../HighlightedText';
 import DiplomaCountBadge from './DiplomaCountBadge';
 import DiplomaDetailsTable from './DiplomaDetailsTable';
 
@@ -39,7 +40,9 @@ const MentorRow = (props: MentorListItemProps) => {
               }`}
             />
             <span class="truncate">
-              {displayName(props.summary.mentor, language())}
+              <HighlightedText
+                text={displayName(props.summary.mentor, language())}
+              />
             </span>
           </button>
         </TableCell>
