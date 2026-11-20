@@ -25,7 +25,9 @@ export default function MentorsPageHeader() {
         <img
           alt={t().brand}
           class="h-12 w-12 shrink-0 object-contain"
-          src="/logo.png"
+          height="48"
+          src="/logo-header.webp"
+          width="48"
         />
         <h1 class="min-w-0 flex-1 wrap-break-word text-base font-bold leading-tight tracking-tight sm:text-xl">
           {t().appTitle}
