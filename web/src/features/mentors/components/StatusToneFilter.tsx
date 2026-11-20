@@ -18,7 +18,7 @@ type StatusToneFilterProps = {
   value: string;
 };
 
-const dotClasses: Record<StatusTone, string> = {
+export const toneDotClasses: Record<StatusTone, string> = {
   cancelled: 'bg-red-600 dark:bg-red-400',
   complete: 'bg-green-600 dark:bg-green-400',
   progress: 'bg-blue-600 dark:bg-blue-400',
@@ -68,7 +68,7 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
                   aria-hidden="true"
                   class={cn(
                     'size-2 shrink-0 rounded-full',
-                    dotClasses[tone],
+                    toneDotClasses[tone],
                     props.counts[tone] === 0 && 'opacity-40',
                   )}
                 />

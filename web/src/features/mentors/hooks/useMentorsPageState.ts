@@ -36,6 +36,7 @@ import {
   countByTone,
 } from '../selectors';
 import { aggregateByMentor } from '../utils';
+import { countByYear } from '../year-stats';
 import {
   countAutoExpandable,
   createMentorExpansion,
@@ -183,6 +184,10 @@ export const useMentorsPageState = (
     buildStatusOptions(diplomas(), config.getStatusStage),
   );
   const yearOptions = createMemo(() => buildYearOptions(diplomas()));
+  // Over all theses, like the other statistics.
+  const yearStats = createMemo(() =>
+    countByYear(diplomas() ?? [], getStatusTone),
+  );
   const medianDiplomas = createMemo(() =>
     calculateMedianDiplomas(mentorSummaries()),
   );
@@ -278,6 +283,7 @@ export const useMentorsPageState = (
     getCountShare,
     getSearchAttemptId: searchAnalytics.getSearchAttemptId,
     getStatusInfo,
+    getStatusTone,
     handleSort,
     hasActiveFilters,
     isExpanded,
@@ -302,5 +308,6 @@ export const useMentorsPageState = (
     totalMentorsCount,
     yearFilter,
     yearOptions,
+    yearStats,
   };
 };

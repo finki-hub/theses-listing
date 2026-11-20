@@ -11,6 +11,7 @@ const SEARCH_URL = /q=lossless/u;
 const CANCELLED_CHIP = /Cancelled/u;
 const CANCELLED_URL = /status=tone%3Acancelled/u;
 const MASTERS_URL = /\/masters\?q=medical/u;
+const YEAR_URL = /year=2019/u;
 
 // Names are matched as substrings, so rank prefixes and counts don't matter.
 const mentorButton = (page: Page, name: string) =>
@@ -141,4 +142,28 @@ test('keeps navigation in reach in a long list', async ({ isMobile, page }) => {
   await backToTop.click();
   await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
   await expect(backToTop).toBeHidden();
+});
+
+test('filters by a year from the chart and profiles a mentor', async ({
+  page,
+}) => {
+  await mockCatalogs(page, { diplomas: createLongCatalog(10) });
+  await page.goto('/');
+
+  const chartToggle = page.getByRole('button', { name: 'Theses per year' });
+  // Phones start with the chart collapsed.
+  if ((await chartToggle.getAttribute('aria-expanded')) === 'false')
+    await chartToggle.click();
+
+  const bar = page.getByRole('button', { name: '2019: 2' });
+  await bar.click();
+
+  await expect(bar).toHaveAttribute('aria-pressed', 'true');
+  await expect(page).toHaveURL(YEAR_URL);
+  await expect(mentorButton(page, 'Mentor 002')).toBeVisible();
+  await expect(mentorButton(page, 'Mentor 001')).toHaveCount(0);
+
+  await mentorButton(page, 'Mentor 002').click();
+  await expect(page.getByText('All theses: 1')).toBeVisible();
+  await expect(page.getByText('Busiest year: 2019 (1)')).toBeVisible();
 });
