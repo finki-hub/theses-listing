@@ -119,6 +119,7 @@ const defineSearchAndSelectionTests = () => {
     expect(captureAnalytics).toHaveBeenCalledTimes(1);
     const properties = vi.mocked(captureAnalytics).mock.calls[0]?.[1];
     expect(properties).toMatchObject({
+      auto_expanded_count: 0,
       result_count: 1,
       section: 'diplomas',
       trigger: 'query_edit',
@@ -163,6 +164,12 @@ const defineSearchAndSelectionTests = () => {
     await vi.advanceTimersByTimeAsync(300);
     expect(state.expandedMentors()).toEqual(['Mentor']);
     expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=');
+
+    await vi.advanceTimersByTimeAsync(200);
+    expect(captureAnalytics).toHaveBeenLastCalledWith(
+      'catalog_search',
+      expect.objectContaining({ auto_expanded_count: 1, result_count: 1 }),
+    );
 
     state.toggleExpanded('Mentor');
     expect(state.isExpanded('Mentor')).toBe(false);

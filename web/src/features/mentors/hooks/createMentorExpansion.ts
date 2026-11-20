@@ -13,6 +13,17 @@ import type { FilteredMentorSummary } from '../types';
 const AUTO_EXPAND_LIMIT = 5;
 const AUTO_EXPAND_DELAY_MS = 300;
 
+const getAutoExpandable = (summaries: readonly FilteredMentorSummary[]) =>
+  summaries
+    .filter((summary) => !summary.matchedByMentor)
+    .slice(0, AUTO_EXPAND_LIMIT)
+    .map((summary) => summary.mentor);
+
+// For analytics: how many mentors a settled search opens on its own.
+export const countAutoExpandable = (
+  summaries: readonly FilteredMentorSummary[],
+) => getAutoExpandable(summaries).length;
+
 type MentorExpansionOptions = {
   readonly filteredSummaries: Accessor<FilteredMentorSummary[]>;
   readonly initialExpanded: readonly string[];
@@ -53,11 +64,7 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
     // Wait until typing settles so rows don't flicker open and closed.
     return query.trim().length === 0 || query !== settledSearch()
       ? []
-      : options
-          .filteredSummaries()
-          .filter((summary) => !summary.matchedByMentor)
-          .slice(0, AUTO_EXPAND_LIMIT)
-          .map((summary) => summary.mentor);
+      : getAutoExpandable(options.filteredSummaries());
   });
 
   const expandedMentors = createMemo(() => {

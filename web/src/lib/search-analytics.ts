@@ -11,6 +11,7 @@ export type SearchIntent = {
 
 type SearchAnalyticsOptions = {
   readonly active: Accessor<boolean>;
+  readonly autoExpandedCount: Accessor<number>;
   readonly count: Accessor<number>;
   readonly intent: Accessor<SearchIntent>;
   readonly ready: Accessor<boolean>;
@@ -93,6 +94,7 @@ export const createSearchAnalytics = (options: SearchAnalyticsOptions) => {
       initialIntent = current;
       refreshPending = false;
       const properties = {
+        auto_expanded_count: options.autoExpandedCount(),
         result_count: count,
         search_attempt_id: id,
         section: options.section,
