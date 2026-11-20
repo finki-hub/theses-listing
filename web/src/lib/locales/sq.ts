@@ -64,6 +64,9 @@ export const sq = {
   staleWarning:
     'Përditësimi i fundit dështoi, prandaj të dhënat mund të jenë të vjetruara.',
   status: 'Statusi',
+  statusCancelled: 'Anuluar',
+  statusComplete: 'Përfunduar',
+  statusInProgress: 'Në proces',
   statusStep: 'Hapi {step} nga {total}',
   student: 'Studenti',
   themeDark: 'E errët',
