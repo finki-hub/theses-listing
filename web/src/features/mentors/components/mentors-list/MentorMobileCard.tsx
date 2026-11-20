@@ -16,7 +16,7 @@ const MentorMobileCard = (props: MentorListItemProps) => {
   const { language } = useLanguage();
   const detailsId = createUniqueId();
   return (
-    <Card class="gap-0 overflow-hidden border-border/70 py-0 shadow-sm sm:hidden">
+    <Card class="gap-0 overflow-hidden border-border/70 py-0 shadow-sm">
       <button
         aria-controls={props.expanded ? detailsId : undefined}
         aria-expanded={props.expanded}

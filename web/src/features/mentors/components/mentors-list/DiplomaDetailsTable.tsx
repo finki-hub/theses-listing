@@ -1,5 +1,5 @@
 import { Link } from 'lucide-solid';
-import { For } from 'solid-js';
+import { For, Show } from 'solid-js';
 import { toast } from 'solid-sonner';
 
 import type { Diploma } from '@/types';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import DownloadButton from '@/features/mentors/components/mentors-list/DownloadButton.tsx';
 import { formatThesisDate } from '@/lib/format';
 import { useLanguage } from '@/lib/LanguageProvider';
+import { BREAKPOINTS, createMediaQuery } from '@/lib/media-query';
 
 import type { StatusInfo } from '../../section';
 import type { DiplomaDetailsTableProps } from './types';
@@ -112,102 +113,108 @@ const MobileDiplomaCard = (props: {
 
 const DiplomaDetailsTable = (props: DiplomaDetailsTableProps) => {
   const { language, t } = useLanguage();
+  const isWide = createMediaQuery(BREAKPOINTS.md);
   return (
     <div class="bg-muted/30 px-4 py-3 md:px-8 md:py-4">
       {/* Card layout below md: the fixed-width columns need room to read well. */}
-      <ul class="divide-y divide-border/60 md:hidden">
-        <For each={props.diplomas}>
-          {(diploma) => (
-            <MobileDiplomaCard
-              diploma={diploma}
-              getFileUrl={props.getFileUrl}
-              getSearchAttemptId={props.getSearchAttemptId}
-              getStatusInfo={props.getStatusInfo}
-              section={props.section}
-            />
-          )}
-        </For>
-      </ul>
-
-      <table class="hidden w-full table-fixed text-sm md:table">
-        <thead>
-          <tr class="border-b text-muted-foreground">
-            <th
-              class="w-[22%] pr-4 pb-2 text-left font-medium"
-              scope="col"
-            >
-              {t().student}
-            </th>
-            <th
-              class="pr-4 pb-2 text-left font-medium"
-              scope="col"
-            >
-              {t().title}
-            </th>
-            <th
-              class="w-[24%] pr-4 pb-2 text-left font-medium"
-              scope="col"
-            >
-              {t().status}
-            </th>
-            <th
-              class="w-28 pr-4 pb-2 text-left font-medium"
-              scope="col"
-            >
-              {t().date}
-            </th>
-            <th
-              class="w-16 pb-2 text-center font-medium"
-              scope="col"
-            >
-              {t().file}
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <For each={props.diplomas}>
-            {(diploma) => (
-              <tr class="border-b border-border/50 align-top last:border-0">
-                <td
-                  class="py-2.5 pr-4"
-                  style={{ 'overflow-wrap': 'anywhere' }}
-                >
-                  <HighlightedText
-                    text={displayName(diploma.student, language())}
-                  />
-                </td>
-                <td
-                  class="py-2.5 pr-4 leading-5"
-                  style={{ 'overflow-wrap': 'anywhere' }}
-                >
-                  <HighlightedText text={diploma.title} />
-                  <ThesisExtras
-                    diploma={diploma}
-                    section={props.section}
-                  />
-                </td>
-                <td class="py-2 pr-4">
-                  <StatusBadge
-                    info={props.getStatusInfo(diploma.status)}
-                    section={props.section}
-                    status={diploma.status}
-                  />
-                </td>
-                <td class="py-2.5 pr-4 whitespace-nowrap text-muted-foreground tabular-nums">
-                  <DateDisplay value={diploma.dateOfSubmission} />
-                </td>
-                <td class="py-1.5 text-center">
-                  <DownloadButton
-                    getSearchAttemptId={props.getSearchAttemptId}
-                    section={props.section}
-                    url={props.getFileUrl(diploma.fileId)}
-                  />
-                </td>
-              </tr>
-            )}
-          </For>
-        </tbody>
-      </table>
+      <Show
+        fallback={
+          <ul class="divide-y divide-border/60">
+            <For each={props.diplomas}>
+              {(diploma) => (
+                <MobileDiplomaCard
+                  diploma={diploma}
+                  getFileUrl={props.getFileUrl}
+                  getSearchAttemptId={props.getSearchAttemptId}
+                  getStatusInfo={props.getStatusInfo}
+                  section={props.section}
+                />
+              )}
+            </For>
+          </ul>
+        }
+        when={isWide()}
+      >
+        <table class="w-full table-fixed text-sm">
+          <thead>
+            <tr class="border-b text-muted-foreground">
+              <th
+                class="w-[22%] pr-4 pb-2 text-left font-medium"
+                scope="col"
+              >
+                {t().student}
+              </th>
+              <th
+                class="pr-4 pb-2 text-left font-medium"
+                scope="col"
+              >
+                {t().title}
+              </th>
+              <th
+                class="w-[24%] pr-4 pb-2 text-left font-medium"
+                scope="col"
+              >
+                {t().status}
+              </th>
+              <th
+                class="w-28 pr-4 pb-2 text-left font-medium"
+                scope="col"
+              >
+                {t().date}
+              </th>
+              <th
+                class="w-16 pb-2 text-center font-medium"
+                scope="col"
+              >
+                {t().file}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <For each={props.diplomas}>
+              {(diploma) => (
+                <tr class="border-b border-border/50 align-top last:border-0">
+                  <td
+                    class="py-2.5 pr-4"
+                    style={{ 'overflow-wrap': 'anywhere' }}
+                  >
+                    <HighlightedText
+                      text={displayName(diploma.student, language())}
+                    />
+                  </td>
+                  <td
+                    class="py-2.5 pr-4 leading-5"
+                    style={{ 'overflow-wrap': 'anywhere' }}
+                  >
+                    <HighlightedText text={diploma.title} />
+                    <ThesisExtras
+                      diploma={diploma}
+                      section={props.section}
+                    />
+                  </td>
+                  <td class="py-2 pr-4">
+                    <StatusBadge
+                      info={props.getStatusInfo(diploma.status)}
+                      section={props.section}
+                      status={diploma.status}
+                    />
+                  </td>
+                  <td class="py-2.5 pr-4 whitespace-nowrap text-muted-foreground tabular-nums">
+                    <DateDisplay value={diploma.dateOfSubmission} />
+                  </td>
+                  <td class="py-1.5 text-center">
+                    <DownloadButton
+                      getSearchAttemptId={props.getSearchAttemptId}
+                      section={props.section}
+                      url={props.getFileUrl(diploma.fileId)}
+                    />
+                  </td>
+                </tr>
+              )}
+            </For>
+          </tbody>
+        </table>
+      </Show>
 
       <div class="mt-2 flex justify-end border-t border-border/50 pt-2">
         <CopyMentorLinkButton mentor={props.mentor} />

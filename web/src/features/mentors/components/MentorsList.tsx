@@ -3,6 +3,7 @@ import { For, Show } from 'solid-js';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/lib/LanguageProvider';
+import { BREAKPOINTS, createMediaQuery } from '@/lib/media-query';
 
 import type { MentorsListProps } from './mentors-list/types';
 
@@ -35,98 +36,108 @@ const EmptyState = (props: {
   );
 };
 
-const MentorsList = (props: MentorsListProps) => (
-  <>
-    <MobileSortControls
-      onSort={props.onSort}
-      sortDirection={props.sortDirection}
-      sortField={props.sortField}
-    />
+const MentorsList = (props: MentorsListProps) => {
+  // Render only the visible layout; both used to be rendered and one hidden
+  // with CSS, doubling the DOM and the highlighting work.
+  const isWide = createMediaQuery(BREAKPOINTS.sm);
+  return (
+    <Show
+      fallback={
+        <>
+          <MobileSortControls
+            onSort={props.onSort}
+            sortDirection={props.sortDirection}
+            sortField={props.sortField}
+          />
 
-    <div class="space-y-3 sm:hidden">
-      <Show
-        fallback={
-          <div class="rounded-md border border-dashed">
-            <EmptyState
-              hasActiveFilters={props.hasActiveFilters}
-              onClearFilters={props.onClearFilters}
-            />
-          </div>
-        }
-        when={props.filteredSummaries.length > 0}
-      >
-        <For each={props.filteredSummaries}>
-          {(summary, index) => (
-            <MentorMobileCard
-              expanded={props.isExpanded(summary.mentor)}
-              getCountShare={props.getCountShare}
-              getFileUrl={props.getFileUrl}
-              getSearchAttemptId={props.getSearchAttemptId}
-              getStatusInfo={props.getStatusInfo}
-              hasActiveFilters={props.hasActiveFilters}
-              index={index()}
-              onToggle={() => {
-                props.onToggle(summary.mentor);
-              }}
-              section={props.section}
-              showRank={props.sortField === 'totalDiplomas'}
-              summary={summary}
-            />
-          )}
-        </For>
-      </Show>
-    </div>
-
-    <div class="hidden rounded-md border sm:block">
-      <Table>
-        <MentorTableHeader
-          countHeaderLabel={props.tableCountHeader}
-          onSort={props.onSort}
-          showRank={props.sortField === 'totalDiplomas'}
-          sortDirection={props.sortDirection}
-          sortField={props.sortField}
-        />
-        <TableBody>
-          <Show
-            fallback={
-              <TableRow class="hover:bg-transparent">
-                <TableCell
-                  class="whitespace-normal"
-                  colSpan={props.sortField === 'totalDiplomas' ? 3 : 2}
-                >
+          <div class="space-y-3">
+            <Show
+              fallback={
+                <div class="rounded-md border border-dashed">
                   <EmptyState
                     hasActiveFilters={props.hasActiveFilters}
                     onClearFilters={props.onClearFilters}
                   />
-                </TableCell>
-              </TableRow>
-            }
-            when={props.filteredSummaries.length > 0}
-          >
-            <For each={props.filteredSummaries}>
-              {(summary, index) => (
-                <MentorRow
-                  expanded={props.isExpanded(summary.mentor)}
-                  getCountShare={props.getCountShare}
-                  getFileUrl={props.getFileUrl}
-                  getSearchAttemptId={props.getSearchAttemptId}
-                  getStatusInfo={props.getStatusInfo}
-                  hasActiveFilters={props.hasActiveFilters}
-                  index={index()}
-                  onToggle={() => {
-                    props.onToggle(summary.mentor);
-                  }}
-                  section={props.section}
-                  showRank={props.sortField === 'totalDiplomas'}
-                  summary={summary}
-                />
-              )}
-            </For>
-          </Show>
-        </TableBody>
-      </Table>
-    </div>
-  </>
-);
+                </div>
+              }
+              when={props.filteredSummaries.length > 0}
+            >
+              <For each={props.filteredSummaries}>
+                {(summary, index) => (
+                  <MentorMobileCard
+                    expanded={props.isExpanded(summary.mentor)}
+                    getCountShare={props.getCountShare}
+                    getFileUrl={props.getFileUrl}
+                    getSearchAttemptId={props.getSearchAttemptId}
+                    getStatusInfo={props.getStatusInfo}
+                    hasActiveFilters={props.hasActiveFilters}
+                    index={index()}
+                    onToggle={() => {
+                      props.onToggle(summary.mentor);
+                    }}
+                    section={props.section}
+                    showRank={props.sortField === 'totalDiplomas'}
+                    summary={summary}
+                  />
+                )}
+              </For>
+            </Show>
+          </div>
+        </>
+      }
+      when={isWide()}
+    >
+      <div class="rounded-md border">
+        <Table>
+          <MentorTableHeader
+            countHeaderLabel={props.tableCountHeader}
+            onSort={props.onSort}
+            showRank={props.sortField === 'totalDiplomas'}
+            sortDirection={props.sortDirection}
+            sortField={props.sortField}
+          />
+          <TableBody>
+            <Show
+              fallback={
+                <TableRow class="hover:bg-transparent">
+                  <TableCell
+                    class="whitespace-normal"
+                    colSpan={props.sortField === 'totalDiplomas' ? 3 : 2}
+                  >
+                    <EmptyState
+                      hasActiveFilters={props.hasActiveFilters}
+                      onClearFilters={props.onClearFilters}
+                    />
+                  </TableCell>
+                </TableRow>
+              }
+              when={props.filteredSummaries.length > 0}
+            >
+              <For each={props.filteredSummaries}>
+                {(summary, index) => (
+                  <MentorRow
+                    expanded={props.isExpanded(summary.mentor)}
+                    getCountShare={props.getCountShare}
+                    getFileUrl={props.getFileUrl}
+                    getSearchAttemptId={props.getSearchAttemptId}
+                    getStatusInfo={props.getStatusInfo}
+                    hasActiveFilters={props.hasActiveFilters}
+                    index={index()}
+                    onToggle={() => {
+                      props.onToggle(summary.mentor);
+                    }}
+                    section={props.section}
+                    showRank={props.sortField === 'totalDiplomas'}
+                    summary={summary}
+                  />
+                )}
+              </For>
+            </Show>
+          </TableBody>
+        </Table>
+      </div>
+    </Show>
+  );
+};
 
 export default MentorsList;
