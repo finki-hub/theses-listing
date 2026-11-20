@@ -7,6 +7,8 @@ export const en = {
   clearFilters: 'Clear filters',
   clearSearch: 'Clear search',
   closeNotification: 'Close notification',
+  committee: 'Committee',
+  committeeChair: 'chair',
   copyMentorLink: 'Copy link',
   date: 'Date',
   download: 'Download',
@@ -15,6 +17,7 @@ export const en = {
   file: 'File',
   fileMissing: 'File unavailable',
   github: 'GitHub repository',
+  hideAbstract: 'Hide abstract',
   language: 'Language',
   lastUpdated: 'Last updated: {date}',
   linkCopied: 'Link copied.',
@@ -30,7 +33,7 @@ export const en = {
   refreshPending: 'Preparing a refresh…',
   retry: 'Try again',
   search: 'Search',
-  searchPlaceholder: 'Search by mentor, title, student or status…',
+  searchPlaceholder: 'Search by mentor, title, student, committee or status…',
   sectionNavigation: 'Thesis type',
   sections: {
     diplomas: {
@@ -56,6 +59,7 @@ export const en = {
       totalThesesLabel: 'Total master’s theses',
     },
   },
+  showAbstract: 'Show abstract',
   sortCount: 'By count',
   sorting: 'Sort',
   sortMentor: 'By mentor',

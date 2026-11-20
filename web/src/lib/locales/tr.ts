@@ -9,6 +9,8 @@ export const tr = {
   clearFilters: 'Filtreleri temizle',
   clearSearch: 'Aramayı temizle',
   closeNotification: 'Bildirimi kapat',
+  committee: 'Jüri',
+  committeeChair: 'başkan',
   copyMentorLink: 'Bağlantıyı kopyala',
   date: 'Tarih',
   download: 'İndir',
@@ -17,6 +19,7 @@ export const tr = {
   file: 'Dosya',
   fileMissing: 'Dosya mevcut değil',
   github: 'GitHub deposu',
+  hideAbstract: 'Özeti gizle',
   language: 'Dil',
   lastUpdated: 'Son güncelleme: {date}',
   linkCopied: 'Bağlantı kopyalandı.',
@@ -32,7 +35,7 @@ export const tr = {
   refreshPending: 'Güncelleme hazırlanıyor…',
   retry: 'Tekrar dene',
   search: 'Ara',
-  searchPlaceholder: 'Danışman, başlık, öğrenci veya duruma göre ara…',
+  searchPlaceholder: 'Danışman, başlık, öğrenci, jüri veya duruma göre ara…',
   sectionNavigation: 'Tez türü',
   sections: {
     diplomas: {
@@ -60,6 +63,7 @@ export const tr = {
       totalThesesLabel: 'Toplam yüksek lisans tezi',
     },
   },
+  showAbstract: 'Özeti göster',
   sortCount: 'Sayıya göre',
   sorting: 'Sıralama',
   sortMentor: 'Danışmana göre',

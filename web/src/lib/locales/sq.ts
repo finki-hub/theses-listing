@@ -9,6 +9,8 @@ export const sq = {
   clearFilters: 'Pastro filtrat',
   clearSearch: 'Pastro kërkimin',
   closeNotification: 'Mbyll njoftimin',
+  committee: 'Komisioni',
+  committeeChair: 'kryetar',
   copyMentorLink: 'Kopjo lidhjen',
   date: 'Data',
   download: 'Shkarko',
@@ -17,6 +19,7 @@ export const sq = {
   file: 'Skedari',
   fileMissing: 'Skedari nuk është i disponueshëm',
   github: 'Depoja në GitHub',
+  hideAbstract: 'Fshih abstraktin',
   language: 'Gjuha',
   lastUpdated: 'Përditësimi i fundit: {date}',
   linkCopied: 'Lidhja u kopjua.',
@@ -32,7 +35,8 @@ export const sq = {
   refreshPending: 'Po përgatitet përditësimi…',
   retry: 'Provo përsëri',
   search: 'Kërko',
-  searchPlaceholder: 'Kërko sipas mentorit, titullit, studentit ose statusit…',
+  searchPlaceholder:
+    'Kërko sipas mentorit, titullit, studentit, komisionit ose statusit…',
   sectionNavigation: 'Lloji i punimit',
   sections: {
     diplomas: {
@@ -58,6 +62,7 @@ export const sq = {
       totalThesesLabel: 'Gjithsej punime masteri',
     },
   },
+  showAbstract: 'Shfaq abstraktin',
   sortCount: 'Sipas numrit',
   sorting: 'Renditja',
   sortMentor: 'Sipas mentorit',
