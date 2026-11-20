@@ -1,5 +1,5 @@
 /* eslint-disable camelcase -- PostHog wire contract. */
-import { type CaptureResult, posthog } from 'posthog-js';
+import type { CaptureResult, PostHog } from 'posthog-js';
 
 import { BUILD_REVISION } from './build-revision.generated';
 
@@ -173,9 +173,28 @@ export const sanitizeAnalytics = (
   };
 };
 
-export const initAnalytics = () => {
-  const key = import.meta.env.VITE_POSTHOG_KEY?.trim();
-  if (!key) return;
+// posthog-js is about half of the bundle, so it is loaded in its own chunk
+// after the app starts. Events captured before it arrives are queued.
+const MAX_PENDING_EVENTS = 50;
+const pendingEvents: Array<[string, Record<string, unknown>]> = [];
+const sdk: { client: null | PostHog; loading: null | Promise<void> } = {
+  client: null,
+  loading: null,
+};
+
+const captureSafely = (
+  posthog: PostHog,
+  event: string,
+  properties: Record<string, unknown>,
+) => {
+  try {
+    posthog.capture(event, properties);
+  } catch {
+    // Telemetry is best-effort and must never affect app behavior.
+  }
+};
+
+const startPostHog = (posthog: PostHog, key: string) => {
   posthog.init(key, {
     advanced_disable_feature_flags: true,
     advanced_disable_flags: true,
@@ -203,7 +222,29 @@ export const initAnalytics = () => {
     save_campaign_params: false,
     save_referrer: false,
   });
-  posthog.capture('service_visit');
+  sdk.client = posthog;
+  captureSafely(posthog, 'service_visit', {});
+  for (const [event, properties] of pendingEvents.splice(0)) {
+    captureSafely(posthog, event, properties);
+  }
+};
+
+const loadPostHog = async (key: string) => {
+  try {
+    const { posthog } = await import('posthog-js');
+    startPostHog(posthog, key);
+  } catch {
+    // Telemetry is best-effort; a blocked or failed chunk is ignored.
+    pendingEvents.length = 0;
+  }
+};
+
+export const initAnalytics = (): Promise<void> => {
+  const key = import.meta.env.VITE_POSTHOG_KEY?.trim();
+  if (!key) return Promise.resolve();
+
+  sdk.loading ??= loadPostHog(key);
+  return sdk.loading;
 };
 
 export const captureAnalytics = (
@@ -211,9 +252,9 @@ export const captureAnalytics = (
   properties: Record<string, unknown>,
 ) => {
   if (!import.meta.env.VITE_POSTHOG_KEY?.trim()) return;
-  try {
-    posthog.capture(event, properties);
-  } catch {
-    // Telemetry is best-effort and must never affect app behavior.
+  if (sdk.client) {
+    captureSafely(sdk.client, event, properties);
+  } else if (pendingEvents.length < MAX_PENDING_EVENTS) {
+    pendingEvents.push([event, properties]);
   }
 };

@@ -9,7 +9,7 @@ import { initAnalytics } from '@/lib/analytics.ts';
 
 import App from './App';
 
-initAnalytics();
+void initAnalytics();
 
 const root = document.querySelector('#root');
 

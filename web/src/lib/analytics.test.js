@@ -36,7 +36,7 @@ it('sends only the allowlist through real SDK compression/transport, respecting 
   initAnalytics();
   expect(requests).toHaveLength(0);
   vi.stubEnv('VITE_POSTHOG_KEY', 'phc_fake_test_key');
-  initAnalytics();
+  await initAnalytics();
   const malicious = createMaliciousProperties(location);
   const expected = captureAnalyticsCases({ captureWire, malicious, posthog });
 
