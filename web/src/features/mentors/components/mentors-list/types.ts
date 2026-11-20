@@ -20,6 +20,7 @@ export type DiplomaDetailsTableProps = {
   getFileUrl: (fileId: null | string) => null | string;
   getSearchAttemptId: () => string | undefined;
   getStatusInfo: (status: string) => StatusInfo;
+  mentor: string;
   section: 'diplomas' | 'masters';
 };
 
@@ -33,6 +34,8 @@ export type MentorListItemProps = {
   index: number;
   onToggle: () => void;
   section: 'diplomas' | 'masters';
+  // Rank numbers only mean something when sorted by count.
+  showRank: boolean;
   summary: FilteredMentorSummary;
 };
 
@@ -55,6 +58,7 @@ export type MentorsListProps = {
 
 export type MentorTableHeaderProps = SortControlsProps & {
   countHeaderLabel: string;
+  showRank: boolean;
 };
 
 export type SortControlsProps = {

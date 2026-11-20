@@ -69,6 +69,7 @@ const MentorsList = (props: MentorsListProps) => (
                 props.onToggle(summary.mentor);
               }}
               section={props.section}
+              showRank={props.sortField === 'totalDiplomas'}
               summary={summary}
             />
           )}
@@ -81,6 +82,7 @@ const MentorsList = (props: MentorsListProps) => (
         <MentorTableHeader
           countHeaderLabel={props.tableCountHeader}
           onSort={props.onSort}
+          showRank={props.sortField === 'totalDiplomas'}
           sortDirection={props.sortDirection}
           sortField={props.sortField}
         />
@@ -90,7 +92,7 @@ const MentorsList = (props: MentorsListProps) => (
               <TableRow class="hover:bg-transparent">
                 <TableCell
                   class="whitespace-normal"
-                  colSpan={3}
+                  colSpan={props.sortField === 'totalDiplomas' ? 3 : 2}
                 >
                   <EmptyState
                     hasActiveFilters={props.hasActiveFilters}
@@ -115,6 +117,7 @@ const MentorsList = (props: MentorsListProps) => (
                     props.onToggle(summary.mentor);
                   }}
                   section={props.section}
+                  showRank={props.sortField === 'totalDiplomas'}
                   summary={summary}
                 />
               )}

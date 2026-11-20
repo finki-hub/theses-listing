@@ -16,7 +16,6 @@ type MentorsToolbarProps = {
   filteredDiplomasCount: number;
   filteredMentorsCount: number;
   hasActiveFilters: boolean;
-  isStale: boolean;
   lastUpdatedAt: null | string;
   onClearFilters: () => void;
   search: string;
@@ -58,7 +57,7 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
           />
         </div>
 
-        <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-[minmax(180px,1fr)_minmax(140px,0.85fr)] xl:items-end">
+        <div class="grid grid-cols-2 gap-3 xl:grid-cols-[minmax(180px,1fr)_minmax(140px,0.85fr)] xl:items-end">
           <label class="block space-y-1.5">
             <span class={fieldLabelClass}>{t().status}</span>
             <NativeSelect
@@ -145,14 +144,7 @@ const MentorsToolbar = (props: MentorsToolbarProps) => {
             </Button>
           </Show>
         </div>
-        <div
-          aria-live="polite"
-          class={props.isStale ? 'font-medium text-destructive' : undefined}
-        >
-          {interpolate(props.isStale ? t().staleUpdated : t().lastUpdated, {
-            date: date(),
-          })}
-        </div>
+        <div>{interpolate(t().lastUpdated, { date: date() })}</div>
       </div>
     </div>
   );

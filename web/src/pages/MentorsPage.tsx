@@ -1,5 +1,5 @@
 import { useLocation } from '@solidjs/router';
-import { RefreshCw } from 'lucide-solid';
+import { RefreshCw, TriangleAlert } from 'lucide-solid';
 import { createEffect, Show } from 'solid-js';
 
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { SearchQueryProvider } from '@/features/mentors/components/HighlightedText';
-import LoadingSpinner from '@/features/mentors/components/LoadingSpinner';
+import ListSkeleton from '@/features/mentors/components/ListSkeleton';
 import MentorsList from '@/features/mentors/components/MentorsList';
 import MentorsPageHeader from '@/features/mentors/components/MentorsPageHeader';
 import MentorsStatsCards from '@/features/mentors/components/MentorsStatsCards';
@@ -50,7 +50,8 @@ export default function MentorsPage(props: MentorsPageProps) {
         </div>
 
         <MentorsStatsCards
-          loading={state.diplomas.loading}
+          // Keep showing the previous numbers while a retry refetches.
+          loading={state.diplomas.loading && state.totalDiplomasCount() === 0}
           median={state.medianDiplomas()}
           section={props.config.id}
           topTenDiplomasCount={state.topTenDiplomasCount()}
@@ -69,7 +70,6 @@ export default function MentorsPage(props: MentorsPageProps) {
               filteredDiplomasCount={state.filteredDiplomasCount()}
               filteredMentorsCount={state.filteredSummaries().length}
               hasActiveFilters={state.hasActiveFilters()}
-              isStale={state.isStale()}
               lastUpdatedAt={state.lastUpdatedAt()}
               onClearFilters={state.clearFilters}
               search={state.search()}
@@ -88,7 +88,30 @@ export default function MentorsPage(props: MentorsPageProps) {
             <Show
               when={state.diplomas.loading && state.totalDiplomasCount() === 0}
             >
-              <LoadingSpinner />
+              <ListSkeleton />
+            </Show>
+
+            <Show when={state.isStale() && state.loadError() === null}>
+              <div class="mb-4 flex flex-col items-start gap-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-amber-900 sm:flex-row sm:items-center dark:text-amber-200">
+                <TriangleAlert
+                  aria-hidden="true"
+                  class="hidden size-4 shrink-0 sm:block"
+                />
+                <output class="flex-1">{t().staleWarning}</output>
+                <Button
+                  class="h-8 border-amber-500/40 bg-transparent text-current hover:bg-amber-500/15"
+                  disabled={state.diplomas.loading}
+                  onClick={() => state.refetchDiplomas()}
+                  size="sm"
+                  variant="outline"
+                >
+                  <RefreshCw
+                    aria-hidden="true"
+                    class={`size-4 ${state.diplomas.loading ? 'animate-spin' : ''}`}
+                  />
+                  {t().retry}
+                </Button>
+              </div>
             </Show>
 
             <Show when={state.loadError() !== null}>

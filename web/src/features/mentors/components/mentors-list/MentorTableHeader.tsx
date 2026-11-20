@@ -1,3 +1,5 @@
+import { Show } from 'solid-js';
+
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/lib/LanguageProvider';
 
@@ -15,12 +17,14 @@ const MentorTableHeader = (props: MentorTableHeaderProps) => {
   return (
     <TableHeader>
       <TableRow>
-        <TableHead
-          class="w-12.5 text-center"
-          scope="col"
-        >
-          #
-        </TableHead>
+        <Show when={props.showRank}>
+          <TableHead
+            class="w-12.5 text-center"
+            scope="col"
+          >
+            #
+          </TableHead>
+        </Show>
         <TableHead
           aria-sort={ariaSort('mentor')}
           scope="col"
