@@ -55,7 +55,8 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
                 active()
                   ? 'border-primary/50 bg-primary/10 text-foreground'
                   : 'border-border bg-background text-muted-foreground hover:text-foreground',
-                !active() && props.counts[tone] === 0 && 'opacity-60',
+                // Dim the frame, not the text, so the label keeps its contrast.
+                !active() && props.counts[tone] === 0 && 'border-dashed',
               )}
               onClick={() => {
                 props.onChange(active() ? '' : toneFilterValue(tone));
@@ -65,7 +66,11 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
               <span class="flex max-w-full items-center justify-center gap-1.5">
                 <span
                   aria-hidden="true"
-                  class={cn('size-2 shrink-0 rounded-full', dotClasses[tone])}
+                  class={cn(
+                    'size-2 shrink-0 rounded-full',
+                    dotClasses[tone],
+                    props.counts[tone] === 0 && 'opacity-40',
+                  )}
                 />
                 <span class="min-w-0 text-center">{labels()[tone]}</span>
               </span>
