@@ -104,7 +104,12 @@ const searchResultDimensions = (
   )
     return null;
   properties['result_count'] = input['result_count'];
-  if (event === 'catalog_search') properties['trigger'] = trigger;
+  if (event === 'catalog_search') {
+    properties['trigger'] = trigger;
+    // How many mentors opened on their own, showing matches without a click.
+    if (isCount(input['auto_expanded_count']))
+      properties['auto_expanded_count'] = input['auto_expanded_count'];
+  }
   return properties;
 };
 

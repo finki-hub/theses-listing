@@ -36,7 +36,10 @@ import {
   countByTone,
 } from '../selectors';
 import { aggregateByMentor } from '../utils';
-import { createMentorExpansion } from './createMentorExpansion';
+import {
+  countAutoExpandable,
+  createMentorExpansion,
+} from './createMentorExpansion';
 
 type ThesesResourceOptions = {
   readonly config: SectionConfig;
@@ -213,6 +216,7 @@ export const useMentorsPageState = (
   });
   const searchAnalytics = createSearchAnalytics({
     active: () => search().trim().length > 0,
+    autoExpandedCount: () => countAutoExpandable(filteredSummaries()),
     count: () => filteredSummaries().length,
     intent: searchIntent,
     ready: () => !diplomas.loading && loadError() === null,
