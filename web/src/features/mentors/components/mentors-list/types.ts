@@ -16,6 +16,8 @@ export type DiplomaCountBadgeProps = {
 };
 
 export type DiplomaDetailsTableProps = {
+  // The mentor's full record, for the per-year profile.
+  allDiplomas: Diploma[];
   diplomas: Diploma[];
   getFileUrl: (fileId: null | string) => null | string;
   getSearchAttemptId: () => string | undefined;

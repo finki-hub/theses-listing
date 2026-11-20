@@ -77,6 +77,8 @@ const jsonResponse = (body: unknown) => ({
 export const createLongCatalog = (mentors: number): Diploma[] =>
   Array.from({ length: mentors }, (_, index) => ({
     ...robotsThesis,
+    // Spread over five years, so the per-year chart has something to show.
+    dateOfSubmission: `01.06.${2_018 + (index % 5)}`,
     mentor: `Mentor ${String(index + 1).padStart(3, '0')}`,
     title: `Thesis ${index + 1}`,
   }));

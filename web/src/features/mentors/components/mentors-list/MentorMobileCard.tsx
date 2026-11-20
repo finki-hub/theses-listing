@@ -66,6 +66,7 @@ const MentorMobileCard = (props: MentorListItemProps) => {
           id={detailsId}
         >
           <DiplomaDetailsTable
+            allDiplomas={props.summary.diplomas}
             diplomas={props.summary.filteredDiplomas}
             getFileUrl={props.getFileUrl}
             getSearchAttemptId={props.getSearchAttemptId}

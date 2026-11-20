@@ -13,11 +13,13 @@ import {
 } from '@/components/ui/card';
 import { SearchQueryProvider } from '@/features/mentors/components/HighlightedText';
 import ListSkeleton from '@/features/mentors/components/ListSkeleton';
+import { YearProfileProvider } from '@/features/mentors/components/mentors-list/MentorYearProfile';
 import MentorsList from '@/features/mentors/components/MentorsList';
 import MentorsPageHeader from '@/features/mentors/components/MentorsPageHeader';
 import MentorsStatsCards from '@/features/mentors/components/MentorsStatsCards';
 import MentorsToolbar from '@/features/mentors/components/MentorsToolbar';
 import SectionSwitch from '@/features/mentors/components/SectionSwitch';
+import YearChart from '@/features/mentors/components/YearChart';
 import { useMentorsPageState } from '@/features/mentors/hooks/useMentorsPageState';
 import { type SectionConfig } from '@/features/mentors/section';
 import { useLanguage } from '@/lib/LanguageProvider';
@@ -66,6 +68,13 @@ export default function MentorsPage(props: MentorsPageProps) {
             {t().statsUnfiltered}
           </p>
         </Show>
+
+        <YearChart
+          loading={state.diplomas.loading && state.totalDiplomasCount() === 0}
+          onSelectYear={state.setYearFilter}
+          selectedYear={state.yearFilter()}
+          stats={state.yearStats()}
+        />
 
         {/* clip, not hidden: hidden makes a scroll container, which would
             stop the table header from sticking to the viewport. */}
@@ -153,22 +162,27 @@ export default function MentorsPage(props: MentorsPageProps) {
               }
             >
               <SearchQueryProvider query={state.search()}>
-                <MentorsList
-                  filteredSummaries={state.filteredSummaries()}
-                  getCountShare={state.getCountShare}
-                  getFileUrl={props.config.getFileUrl}
-                  getSearchAttemptId={state.getSearchAttemptId}
-                  getStatusInfo={state.getStatusInfo}
-                  hasActiveFilters={state.hasActiveFilters()}
-                  isExpanded={state.isExpanded}
-                  onClearFilters={state.clearFilters}
-                  onSort={state.handleSort}
-                  onToggle={state.toggleExpanded}
-                  section={props.config.id}
-                  sortDirection={state.sortDirection()}
-                  sortField={state.sortField()}
-                  tableCountHeader={strings().tableCountHeader}
-                />
+                <YearProfileProvider
+                  getStatusTone={state.getStatusTone}
+                  years={state.yearStats().years.map((entry) => entry.year)}
+                >
+                  <MentorsList
+                    filteredSummaries={state.filteredSummaries()}
+                    getCountShare={state.getCountShare}
+                    getFileUrl={props.config.getFileUrl}
+                    getSearchAttemptId={state.getSearchAttemptId}
+                    getStatusInfo={state.getStatusInfo}
+                    hasActiveFilters={state.hasActiveFilters()}
+                    isExpanded={state.isExpanded}
+                    onClearFilters={state.clearFilters}
+                    onSort={state.handleSort}
+                    onToggle={state.toggleExpanded}
+                    section={props.config.id}
+                    sortDirection={state.sortDirection()}
+                    sortField={state.sortField()}
+                    tableCountHeader={strings().tableCountHeader}
+                  />
+                </YearProfileProvider>
               </SearchQueryProvider>
             </Show>
           </CardContent>
