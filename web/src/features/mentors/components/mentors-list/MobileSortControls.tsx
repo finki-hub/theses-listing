@@ -38,7 +38,7 @@ const SortButton = (props: SortButtonProps) => (
 const MobileSortControls = (props: SortControlsProps) => {
   const { t } = useLanguage();
   return (
-    <div class="mb-4 space-y-2 sm:hidden">
+    <div class="mb-4 space-y-2">
       <div class="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
         {t().sorting}
       </div>
