@@ -3,6 +3,7 @@ export const en = {
   allYears: 'All years',
   appTitle: 'FINKI Hub / Theses',
   average: 'Average per mentor',
+  backToTop: 'Back to top',
   brand: 'FINKI Hub',
   clearFilters: 'Clear filters',
   clearSearch: 'Clear search',

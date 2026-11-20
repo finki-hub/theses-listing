@@ -87,8 +87,10 @@ const MentorsList = (props: MentorsListProps) => {
       }
       when={isWide()}
     >
+      {/* The table has two or three columns and wraps, so it never needs to
+          scroll sideways; that lets its header stick while scrolling. */}
       <div class="rounded-md border">
-        <Table>
+        <Table unscrolled>
           <MentorTableHeader
             countHeaderLabel={props.tableCountHeader}
             onSort={props.onSort}

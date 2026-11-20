@@ -15,8 +15,10 @@ const MentorTableHeader = (props: MentorTableHeaderProps) => {
     return props.sortDirection === 'asc' ? 'ascending' : 'descending';
   };
   return (
-    <TableHeader>
-      <TableRow>
+    // Sticky, so the sort controls stay in reach in long lists. The bottom
+    // line is a shadow because collapsed table borders don't stick.
+    <TableHeader class="sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_var(--color-border)] [&_tr]:border-b-0">
+      <TableRow class="hover:bg-transparent">
         <Show when={props.showRank}>
           <TableHead
             class="w-12.5 text-center"

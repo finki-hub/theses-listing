@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { mockCatalogs, useEnglish } from './fixtures';
+import { createLongCatalog, mockCatalogs, useEnglish } from './fixtures';
 
 const ANA = 'Ana Petrovska';
 const MARKO = 'Marko Nikolov';
@@ -117,4 +117,28 @@ test('recovers from a failed load with Try again', async ({ page }) => {
 
   await expect(alert).toHaveCount(0);
   await expect(mentorButton(page, ANA)).toBeVisible();
+});
+
+test('keeps navigation in reach in a long list', async ({ isMobile, page }) => {
+  await mockCatalogs(page, { diplomas: createLongCatalog(80) });
+  await page.goto('/');
+  await expect(mentorButton(page, 'Mentor 080')).toBeAttached();
+
+  const backToTop = page.getByRole('button', { name: 'Back to top' });
+  await expect(backToTop).toBeHidden();
+
+  await page.evaluate(() => {
+    scrollTo(0, document.documentElement.scrollHeight);
+  });
+  await expect(backToTop).toBeVisible();
+
+  // The desktop table header sticks to the top of the viewport.
+  if (!isMobile) {
+    const header = await page.locator('thead').first().boundingBox();
+    expect(header?.y).toBe(0);
+  }
+
+  await backToTop.click();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBe(0);
+  await expect(backToTop).toBeHidden();
 });

@@ -10,18 +10,20 @@ import {
 
 // Small, made-up catalogs: enough to exercise search, the state filter,
 // expansion and both sections without depending on the live APIs.
+const robotsThesis: Diploma = {
+  dateOfSubmission: '12.03.2025',
+  description: 'A study of path planning for warehouse robots.',
+  fileId: 'file-1',
+  member1: 'Elena Trajkovska',
+  member2: 'Goran Iliev',
+  mentor: 'Ana Petrovska',
+  status: 'Одбрана',
+  student: 'Ivan Stojanov',
+  title: 'Path planning for warehouse robots',
+};
+
 export const diplomas: Diploma[] = [
-  {
-    dateOfSubmission: '12.03.2025',
-    description: 'A study of path planning for warehouse robots.',
-    fileId: 'file-1',
-    member1: 'Elena Trajkovska',
-    member2: 'Goran Iliev',
-    mentor: 'Ana Petrovska',
-    status: 'Одбрана',
-    student: 'Ivan Stojanov',
-    title: 'Path planning for warehouse robots',
-  },
+  robotsThesis,
   {
     dateOfSubmission: '02.10.2026',
     description: 'A mobile app for planning trips.',
@@ -71,10 +73,19 @@ const jsonResponse = (body: unknown) => ({
   status: 200,
 });
 
+// Enough mentors for the list to span several screens.
+export const createLongCatalog = (mentors: number): Diploma[] =>
+  Array.from({ length: mentors }, (_, index) => ({
+    ...robotsThesis,
+    mentor: `Mentor ${String(index + 1).padStart(3, '0')}`,
+    title: `Thesis ${index + 1}`,
+  }));
+
 export const mockCatalogs = async (
   page: Page,
-  options: { failDiplomasOnce?: boolean } = {},
+  options: { diplomas?: Diploma[]; failDiplomasOnce?: boolean } = {},
 ) => {
+  const diplomaCatalog = options.diplomas ?? diplomas;
   let diplomaFailures = options.failDiplomasOnce ? 1 : 0;
 
   await page.route(DIPLOMAS_LIST_URL, async (route) => {
@@ -87,7 +98,7 @@ export const mockCatalogs = async (
       return;
     }
 
-    await route.fulfill(jsonResponse(diplomas));
+    await route.fulfill(jsonResponse(diplomaCatalog));
   });
   await page.route(MASTERS_LIST_URL, async (route) => {
     await route.fulfill(jsonResponse(masters));
