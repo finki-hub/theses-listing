@@ -95,6 +95,7 @@ export const tr = {
   topTenShare: 'İlk 10 danışmanın payı',
   totalMentors: 'Toplam danışman',
   year: 'Yıl',
+  yearChange: '{year} yılına göre {change}',
   yearChartHint: 'Listeyi filtrelemek için bir yıl seçin.',
   yearRecent: 'Son 30 gün',
   yearSoFar: '{year} (şu ana kadar)',

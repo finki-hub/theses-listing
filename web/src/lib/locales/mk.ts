@@ -95,6 +95,7 @@ export const mk = {
   topTenShare: 'Удел на топ 10 ментори',
   totalMentors: 'Вкупно ментори',
   year: 'Година',
+  yearChange: '{change} во однос на {year}',
   yearChartHint: 'Изберете година за да ја филтрирате листата.',
   yearRecent: 'Последни 30 дена',
   yearSoFar: '{year} (досега)',

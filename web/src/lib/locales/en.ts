@@ -89,6 +89,7 @@ export const en = {
   topTenShare: 'Share of the top 10 mentors',
   totalMentors: 'Total mentors',
   year: 'Year',
+  yearChange: '{change} vs {year}',
   yearChartHint: 'Select a year to filter the list.',
   yearRecent: 'Last 30 days',
   yearSoFar: '{year} (so far)',
