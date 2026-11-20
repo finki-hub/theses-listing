@@ -2,7 +2,7 @@
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
     "@kobalte/core": "^0.13.14",
-    "@solidjs/router": "^1.0.3",
+    "@solidjs/router": "^2.0.0",
     "clsx": "^2.1.1",
     "lucide-solid": "^1.74.0",
     "posthog-js": "^1.450.0",
