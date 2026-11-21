@@ -19,6 +19,12 @@ export default defineConfig({
   },
   webServer: {
     command: `npx vite build && npx vite preview --port ${PORT} --strictPort`,
+    // The fixtures mock the production URLs; clear local overrides so the
+    // built app and the mocks always agree.
+    env: {
+      VITE_DIPLOMAS_API_URL: '',
+      VITE_MASTERS_API_URL: '',
+    },
     reuseExistingServer: !process.env['CI'],
     timeout: 180_000,
     url: `http://localhost:${PORT}`,
