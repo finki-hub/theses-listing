@@ -1,9 +1,38 @@
-export const DIPLOMAS_LIST_URL = 'https://bachelors-api.finki-hub.com/diplomas';
-export const DIPLOMAS_FILE_URL =
-  'https://bachelors-api.finki-hub.com/diplomas/download/';
-export const MASTERS_LIST_URL = 'https://masters-api.finki-hub.com/masters';
-export const MASTERS_FILE_URL =
-  'https://masters-api.finki-hub.com/masters/download/';
+const DEFAULT_DIPLOMAS_API_URL = 'https://bachelors-api.finki-hub.com';
+const DEFAULT_MASTERS_API_URL = 'https://masters-api.finki-hub.com';
+
+const trimTrailingSlashes = (value: string): string => {
+  let end = value.length;
+
+  while (end > 0 && value[end - 1] === '/') {
+    end -= 1;
+  }
+
+  return value.slice(0, end);
+};
+
+export const resolveApiUrl = (
+  value: string | undefined,
+  fallback: string,
+): string => {
+  const trimmed = value?.trim() ?? '';
+
+  return trimTrailingSlashes(trimmed.length > 0 ? trimmed : fallback);
+};
+
+export const DIPLOMAS_API_URL = resolveApiUrl(
+  import.meta.env.VITE_DIPLOMAS_API_URL,
+  DEFAULT_DIPLOMAS_API_URL,
+);
+export const MASTERS_API_URL = resolveApiUrl(
+  import.meta.env.VITE_MASTERS_API_URL,
+  DEFAULT_MASTERS_API_URL,
+);
+
+export const DIPLOMAS_LIST_URL = `${DIPLOMAS_API_URL}/diplomas`;
+export const DIPLOMAS_FILE_URL = `${DIPLOMAS_API_URL}/diplomas/download/`;
+export const MASTERS_LIST_URL = `${MASTERS_API_URL}/masters`;
+export const MASTERS_FILE_URL = `${MASTERS_API_URL}/masters/download/`;
 
 export const STATUS_STAGES: Array<[string, number]> = [
   ['пријава', 1],
