@@ -1,0 +1,8 @@
+name: finki-hub-theses-listing
+
+services:
+  site:
+    image: ghcr.io/finki-hub/theses-listing:latest
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
