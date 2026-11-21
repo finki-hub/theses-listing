@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+
+# Build output
+**/dist
+
+# Local environment files
+.env
+.env.*
+
+# VCS and editor
+.git
+.gitignore
+.github
+.vscode
+.codegraph
+.omo
+.omc
+.slim
+**/.wrangler
+
+# Test output and logs
+test-results
+playwright-report
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore

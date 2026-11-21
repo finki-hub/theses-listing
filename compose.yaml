@@ -1,0 +1,14 @@
+name: finki-hub-theses-listing-dev
+
+services:
+  site:
+    build:
+      context: .
+      args:
+        VITE_DIPLOMAS_API_URL: ${VITE_DIPLOMAS_API_URL:-}
+        VITE_MASTERS_API_URL: ${VITE_MASTERS_API_URL:-}
+    image: finki-hub/theses-listing:latest
+    ports:
+      - "8080:80"
+    pull_policy: never
+    restart: unless-stopped
