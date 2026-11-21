@@ -9,6 +9,6 @@ services:
         VITE_MASTERS_API_URL: ${VITE_MASTERS_API_URL:-}
     image: finki-hub/theses-listing:latest
     ports:
-      - "8080:80"
+      - "8080:8080"
     pull_policy: never
     restart: unless-stopped

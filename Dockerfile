@@ -17,12 +17,16 @@ ENV VITE_MASTERS_API_URL=${VITE_MASTERS_API_URL}
 
 RUN npm run build --workspace theses-listing-web
 
-FROM nginx:alpine AS final
+FROM nginxinc/nginx-unprivileged:alpine AS final
+
+USER root
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 RUN rm -rf /usr/share/nginx/html/*
 
 COPY --from=build /app/web/dist /usr/share/nginx/html
 
-EXPOSE 80
+USER 101
+
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
