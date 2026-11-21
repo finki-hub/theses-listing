@@ -1,6 +1,10 @@
 const DEFAULT_DIPLOMAS_API_URL = 'https://bachelors-api.finki-hub.com';
 const DEFAULT_MASTERS_API_URL = 'https://masters-api.finki-hub.com';
 
+// Playwright imports these constants from Node, where Vite has not defined
+// import.meta.env; the defaults apply in that context.
+const env = import.meta.env as Record<string, string | undefined> | undefined;
+
 const trimTrailingSlashes = (value: string): string => {
   let end = value.length;
 
@@ -21,11 +25,11 @@ export const resolveApiUrl = (
 };
 
 export const DIPLOMAS_API_URL = resolveApiUrl(
-  import.meta.env.VITE_DIPLOMAS_API_URL,
+  env?.['VITE_DIPLOMAS_API_URL'],
   DEFAULT_DIPLOMAS_API_URL,
 );
 export const MASTERS_API_URL = resolveApiUrl(
-  import.meta.env.VITE_MASTERS_API_URL,
+  env?.['VITE_MASTERS_API_URL'],
   DEFAULT_MASTERS_API_URL,
 );
 
