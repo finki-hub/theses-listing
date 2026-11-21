@@ -2,7 +2,7 @@ name: E2E Web
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
     paths: [web/**, package-lock.json, .github/workflows/e2e-web.yaml]
   pull_request:
     types: [opened, synchronize, reopened]
