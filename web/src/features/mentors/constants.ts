@@ -24,11 +24,11 @@ export const resolveApiUrl = (
   return trimTrailingSlashes(trimmed.length > 0 ? trimmed : fallback);
 };
 
-export const DIPLOMAS_API_URL = resolveApiUrl(
+const DIPLOMAS_API_URL = resolveApiUrl(
   env?.['VITE_DIPLOMAS_API_URL'],
   DEFAULT_DIPLOMAS_API_URL,
 );
-export const MASTERS_API_URL = resolveApiUrl(
+const MASTERS_API_URL = resolveApiUrl(
   env?.['VITE_MASTERS_API_URL'],
   DEFAULT_MASTERS_API_URL,
 );
