@@ -61,13 +61,14 @@ const createThesesResource = (options: ThesesResourceOptions) => {
   let disposed = false;
   const [items, setItems] = createSignal<Diploma[] | undefined>();
   const [loading, setLoading] = createSignal(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = createSignal(false);
   onCleanup(() => {
     disposed = true;
     generation += 1;
   });
 
   // Settlement retains existing fallback/error behavior and reports only terminal states.
-  // eslint-disable-next-line sonarjs/cognitive-complexity -- The fetcher must preserve its business error path.
+
   const load = async (isRetry: boolean) => {
     generation += 1;
     const currentGeneration = generation;
@@ -87,10 +88,11 @@ const createThesesResource = (options: ThesesResourceOptions) => {
           section: options.config.id,
           trigger,
         });
+        options.setIsStale(result.stale);
+        options.setLastUpdatedAt(getLastUpdatedAt(result));
+        setItems(result.items);
+        setHasLoadedOnce(true);
       }
-      options.setIsStale(result.stale);
-      options.setLastUpdatedAt(getLastUpdatedAt(result));
-      if (!disposed && currentGeneration === generation) setItems(result.items);
     } catch (error) {
       if (!disposed && currentGeneration === generation) {
         captureAnalytics('catalog_load_result', {
@@ -122,7 +124,7 @@ const createThesesResource = (options: ThesesResourceOptions) => {
 
   const resource = Object.assign(() => items(), { loading });
   const refetch = () => load(true);
-  return [resource, { refetch }] as const;
+  return [resource, { hasLoadedOnce, refetch }] as const;
 };
 
 // Whole-section statistics; like the stats cards, they ignore the filters.
@@ -162,12 +164,13 @@ export const useMentorsPageState = (
   const [isStale, setIsStale] = createSignal(false);
   const [lastUpdatedAt, setLastUpdatedAt] = createSignal<null | string>(null);
   const [loadError, setLoadError] = createSignal<Error | null>(null);
-  const [diplomas, { refetch: refetchDiplomas }] = createThesesResource({
-    config,
-    setIsStale,
-    setLastUpdatedAt,
-    setLoadError,
-  });
+  const [diplomas, { hasLoadedOnce, refetch: refetchDiplomas }] =
+    createThesesResource({
+      config,
+      setIsStale,
+      setLastUpdatedAt,
+      setLoadError,
+    });
   const [search, setSearch] = createSignal(initialState.search);
   const [statusFilter, setStatusFilter] = createSignal(
     initialState.statusFilter,
@@ -267,9 +270,9 @@ export const useMentorsPageState = (
   const { expandedMentors, isExpanded, manualExpanded, toggleExpanded } =
     createMentorExpansion({
       filteredSummaries,
+      hasLoadedOnce,
       initialExpanded: initialState.expandedMentors,
       initialSearch: initialState.search,
-      isReady: () => !diplomas.loading() && loadError() === null,
       onOpen: (mentor) => {
         searchAnalytics.captureResultClick(
           filteredSummaries().findIndex((summary) => summary.mentor === mentor),

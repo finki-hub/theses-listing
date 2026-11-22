@@ -25,10 +25,11 @@ export const countAutoExpandable = (
 
 type MentorExpansionOptions = {
   readonly filteredSummaries: Accessor<FilteredMentorSummary[]>;
+  // True after the first successful catalog load; until then, URL-provided
+  // mentors must survive the initial fetch.
+  readonly hasLoadedOnce: Accessor<boolean>;
   readonly initialExpanded: readonly string[];
   readonly initialSearch: string;
-  // False while data is loading or failed, so URL-provided mentors survive.
-  readonly isReady: Accessor<boolean>;
   readonly onOpen: (mentor: string) => void;
   readonly search: Accessor<string>;
 };
@@ -76,8 +77,10 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
   // also reads tears the frame in two flushes.
   const manualExpanded = createMemo<readonly string[]>(() => {
     const requested = requestedExpanded();
-    // While data is loading or failed, keep URL-provided mentors so they survive.
-    if (!options.isReady()) return requested;
+    // Until the first successful load, keep URL-provided mentors so they
+    // survive it. Afterwards always filter, including during a refetch or an
+    // error, so a hidden mentor is not written back into the URL.
+    if (!options.hasLoadedOnce()) return requested;
 
     const visible = visibleMentors();
     return requested.filter((mentor) => visible.has(mentor));

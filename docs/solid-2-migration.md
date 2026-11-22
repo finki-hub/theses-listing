@@ -1,8 +1,8 @@
 # Solid 2 migration guide
 
-Status: **implemented on branch `feat/solid-2-migration` (2026-11-22) — uncommitted, ready for
-review**. Verified against `solid-js@2.0.3`, `@solidjs/router@2.0.1`,
-`@solidjs/vite-plugin@3.0.1`, `@lucide/solid@1.77.0`.
+Status: **implemented on `feat/solid-2-migration`, pushed as PR #734 (2026-11-22); CI green**.
+Verified against `solid-js@2.0.3`, `@solidjs/router@2.0.1`, `@solidjs/vite-plugin@3.0.1`,
+`@lucide/solid@1.77.0`.
 
 Decision log:
 
@@ -10,6 +10,8 @@ Decision log:
 - 2026-11-22 — `lucide-solid` replaced by `@lucide/solid`, the official Solid 2 package
   (published 2026-11-20). The earlier "defer lucide" decision is reversed.
 - 2026-11-22 — migration implemented in one branch and verified (unit, e2e, build, lint).
+- 2026-11-22 — PR #734 opened; all CI checks green (including Linux Playwright and Docker
+  amd64/arm64).
 
 PR #730 (`@solidjs/router` 1.0.3 → 2.0.0) cannot be merged on its own: router 2 is part of
 the Solid 2 line and declares `solid-js ^2.0.0` + `@solidjs/web ^2.0.0` as required peers.
@@ -42,9 +44,10 @@ accepted for a single component. The icon dependency is a rename, not a rebuild:
   `JSX.Element` imports moved off `solid-js`.
 - **Resource**: `createResource` replaced by a signal plus a `loading` accessor. The initial
   fetch starts from an effect's apply phase (a component-body write is an owned-scope write in
-  2.0); retry, error retention, generation guards and analytics are preserved. One deliberate
-  tightening: a superseded request no longer overwrites `loadError` (the 1.x resource set it
-  outside the generation guard).
+  2.0); retry, error retention, generation guards and analytics are preserved. Every response
+  write — items, stale flag, last-updated timestamp and the first-success flag — is guarded by
+  the request generation, so a superseded response cannot overwrite newer metadata. One
+  deliberate tightening: a superseded request no longer overwrites `loadError` either.
 - **History**: the query-string sync preserves `history.state` instead of replacing it with
   `{}`. Router 2 keeps `_depth` there to track back/forward entries; clobbering it corrupted
   that bookkeeping (and `useBeforeLeave`, if ever used). Covered by a permanent e2e test.
@@ -445,10 +448,10 @@ Results on `feat/solid-2-migration` (2026-11-22):
 | `npm run check:web` | pass |
 | `npm run lint:web` | pass |
 | `npm run build` | pass — 2733 modules transformed |
-| `npm test` | pass — web 84 passed / 2 skipped; bachelors-api 29; masters-api 19 |
+| `npm test` | pass — web 86 passed / 2 skipped; bachelors-api 29; masters-api 19 |
 | `cd web && npx playwright test` | pass — 36 tests (18 × desktop + mobile) |
 | Dev build under `vite dev` (temporary Playwright config) | pass — deep links, filters, chart, sort, keyboard, back-to-top, retry, toast, `/mentors`, back/forward and SVG casing; no Solid diagnostics |
-| Docker build stage on `node:26-alpine` (`npm ci --ignore-scripts` + web build) | pass — Alpine/musl native compiler works (final nginx pull not completed locally) |
+| Docker build on `node:26-alpine` (`npm ci --ignore-scripts` + web build) | pass — CI built and merged both `linux/amd64` and `linux/arm64` |
 | `npm ci` from a clean tree, normal and `--ignore-scripts` | pass — lockfile reproducible |
 
 Reproduce with:
@@ -502,7 +505,9 @@ Worth adding while the migration is open:
 7. **Manual expansion pruning is now derived, not written back.** A manually expanded mentor
    disappears from the URL while filtered out, but returns if the filter is cleared. The 1.x
    effect pruned it permanently; Solid 2 flags that write-back as `EFFECT_WRITES_OWN_SOURCE`.
-   Worth a UX decision before merge.
+   After the first successful load, hidden entries stay out of the URL through refetches and
+   errors too (the raw list is only used until that first success). Worth a UX decision before
+   merge.
 
 ## Sources
 

@@ -521,6 +521,80 @@ const defineCleanupAndRetainedSelectionTests = () => {
     await Promise.resolve();
     expect(captureAnalytics).toHaveBeenCalledTimes(count);
   });
+
+  it('does not restore a filtered mentor to the URL during a refetch', async () => {
+    const other = {
+      ...DIPLOMA,
+      mentor: 'Other',
+      student: 'Someone',
+      title: 'Other thesis',
+    };
+    const { promise: refetchCatalog, resolve: resolveRefetch } =
+      Promise.withResolvers<CatalogResult>();
+    const fetchTheses = vi
+      .fn<() => Promise<CatalogResult>>()
+      .mockResolvedValueOnce(createCatalogResult([DIPLOMA, other]))
+      .mockImplementationOnce(() => refetchCatalog);
+    const replaceState = stubBrowserLocation('?mentor=Mentor');
+    const state = createTestState(fetchTheses);
+    flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(state.expandedMentors()).toEqual(['Mentor']);
+
+    state.setSearch('Other');
+    flush();
+    await Promise.resolve();
+    expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=Mentor');
+
+    const refresh = state.refetchDiplomas();
+    flush();
+    await Promise.resolve();
+    expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=Mentor');
+
+    resolveRefetch(createCatalogResult([DIPLOMA, other]));
+    await refresh;
+    expect(fetchTheses).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps freshness metadata from the latest overlapping load', async () => {
+    stubBrowserLocation('');
+    const pending: Array<(result: CatalogResult) => void> = [];
+    const state = createTestState(
+      () =>
+        new Promise((resolve) => {
+          pending.push(resolve);
+        }),
+    );
+    await Promise.resolve();
+    expect(pending).toHaveLength(1);
+
+    const refresh = state.refetchDiplomas();
+    await Promise.resolve();
+    expect(pending).toHaveLength(2);
+
+    // The newer request settles first; the superseded one must not overwrite
+    // its data or its freshness metadata.
+    pending[1]?.(
+      createCatalogResult([DIPLOMA], {
+        stale: true,
+        updatedAt: '2026-11-20T10:00:00.000Z',
+      }),
+    );
+    await Promise.resolve();
+    pending[0]?.(
+      createCatalogResult([{ ...DIPLOMA, title: 'Older' }], {
+        stale: false,
+        updatedAt: '2026-11-19T10:00:00.000Z',
+      }),
+    );
+    await Promise.resolve();
+    await refresh;
+
+    expect(state.diplomas()).toEqual([DIPLOMA]);
+    expect(state.isStale()).toBe(true);
+    expect(state.lastUpdatedAt()).toBe('2026-11-20T10:00:00.000Z');
+  });
 };
 
 describe('useMentorsPageState', () => {
