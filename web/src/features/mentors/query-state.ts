@@ -98,5 +98,7 @@ export const syncMentorsSearchParams = (options: {
   const queryString = nextSearch ? `?${nextSearch}` : '';
   const nextUrl = `${location.pathname}${queryString}`;
 
-  history.replaceState({}, '', nextUrl);
+  // Preserve the entry's state: the router keeps `_depth` there for back/forward
+  // tracking, and replacing it with `{}` corrupts that bookkeeping.
+  history.replaceState(history.state, '', nextUrl);
 };

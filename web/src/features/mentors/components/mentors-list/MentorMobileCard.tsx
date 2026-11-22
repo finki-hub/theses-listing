@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-solid';
+import { ChevronRight } from '@lucide/solid';
 import { createUniqueId, Show } from 'solid-js';
 
 import { Card } from '@/components/ui/card';
@@ -20,7 +20,7 @@ const MentorMobileCard = (props: MentorListItemProps) => {
     <Card class="gap-0 overflow-hidden border-border/70 py-0 shadow-sm">
       <button
         aria-controls={props.expanded ? detailsId : undefined}
-        aria-expanded={props.expanded}
+        aria-expanded={props.expanded ? 'true' : 'false'}
         class="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-muted/40"
         onClick={() => {
           props.onToggle();

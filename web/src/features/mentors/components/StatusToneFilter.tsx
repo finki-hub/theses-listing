@@ -49,7 +49,7 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
           const active = () => selectedTone() === tone;
           return (
             <button
-              aria-pressed={active()}
+              aria-pressed={active() ? 'true' : 'false'}
               class={cn(
                 chipClass,
                 active()

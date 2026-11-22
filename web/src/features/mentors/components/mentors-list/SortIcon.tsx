@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-solid';
+import { ArrowDown, ArrowUp, ArrowUpDown } from '@lucide/solid';
 import { Show } from 'solid-js';
 
 import type { SortIconProps } from './types';

@@ -1,11 +1,12 @@
-import { type ComponentProps, splitProps } from 'solid-js';
+import { type ComponentProps } from '@solidjs/web';
+import { omit } from 'solid-js';
 
 import { cn } from '@/lib/cn';
 
 export type CardProps = ComponentProps<'div'>;
 
 export const Card = (props: CardProps) => {
-  const [, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <div
@@ -21,7 +22,7 @@ export const Card = (props: CardProps) => {
 export type CardHeaderProps = ComponentProps<'div'>;
 
 export const CardHeader = (props: CardHeaderProps) => {
-  const [, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <div
@@ -37,7 +38,7 @@ export const CardHeader = (props: CardHeaderProps) => {
 export type CardTitleProps = ComponentProps<'div'>;
 
 export const CardTitle = (props: CardTitleProps) => {
-  const [, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <div
@@ -50,7 +51,7 @@ export const CardTitle = (props: CardTitleProps) => {
 export type CardDescriptionProps = ComponentProps<'div'>;
 
 export const CardDescription = (props: CardDescriptionProps) => {
-  const [, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <div
@@ -63,7 +64,7 @@ export const CardDescription = (props: CardDescriptionProps) => {
 export type CardContentProps = ComponentProps<'div'>;
 
 export const CardContent = (props: CardContentProps) => {
-  const [, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <div
@@ -76,7 +77,7 @@ export const CardContent = (props: CardContentProps) => {
 export type CardFooterProps = ComponentProps<'div'>;
 
 export const CardFooter = (props: CardFooterProps) => {
-  const [, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <div

@@ -1,4 +1,4 @@
-import { Route, Router } from '@solidjs/router';
+import { createRouter } from '@solidjs/router';
 
 import { Toaster } from '@/components/ui/sonner.tsx';
 import { DIPLOMAS_SECTION, MASTERS_SECTION } from '@/features/mentors/section';
@@ -10,23 +10,18 @@ import MentorsPage from '@/pages/MentorsPage';
 const DiplomasPage = () => <MentorsPage config={DIPLOMAS_SECTION} />;
 const MastersPage = () => <MentorsPage config={MASTERS_SECTION} />;
 
+const routes = [
+  { component: DiplomasPage, path: '/' },
+  { component: DiplomasPage, path: '/mentors' },
+  { component: MastersPage, path: '/masters' },
+];
+
+const Router = createRouter({ routes });
+
 export default function App() {
   return (
     <LanguageProvider>
-      <Router>
-        <Route
-          component={DiplomasPage}
-          path="/"
-        />
-        <Route
-          component={DiplomasPage}
-          path="/mentors"
-        />
-        <Route
-          component={MastersPage}
-          path="/masters"
-        />
-      </Router>
+      <Router />
       <Toaster position="bottom-right" />
     </LanguageProvider>
   );

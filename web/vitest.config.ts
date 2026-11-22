@@ -1,5 +1,5 @@
+import solid from '@solidjs/vite-plugin';
 import { resolve } from 'node:path';
-import solid from 'vite-plugin-solid';
 import { configDefaults } from 'vitest/config';
 
 export default function createConfig() {
@@ -9,7 +9,14 @@ export default function createConfig() {
       alias: {
         '@': resolve(import.meta.dirname, './src'),
       },
-      conditions: ['development', 'browser'],
+      conditions: ['solid', 'development', 'browser'],
+    },
+    ssr: {
+      resolve: {
+        // Vitest's SSR pipeline otherwise resolves solid-js to its server
+        // build, where writes are inert and effects never flush.
+        conditions: ['solid', 'browser', 'development'],
+      },
     },
     test: {
       environment: 'node',

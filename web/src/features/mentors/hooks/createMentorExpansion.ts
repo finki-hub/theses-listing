@@ -3,7 +3,6 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  onCleanup,
 } from 'solid-js';
 
 import type { FilteredMentorSummary } from '../types';
@@ -35,29 +34,31 @@ type MentorExpansionOptions = {
 };
 
 export const createMentorExpansion = (options: MentorExpansionOptions) => {
-  // Mentors the user opened explicitly; these are kept in the URL.
-  const [manualExpanded, setManualExpanded] = createSignal<readonly string[]>(
-    options.initialExpanded,
-  );
+  // Mentors the user opened explicitly; the URL keeps the visible subset.
+  const [requestedExpanded, setRequestedExpanded] = createSignal<
+    readonly string[]
+  >(options.initialExpanded);
   // Mentors the user closed while they were auto-expanded for the current
   // search; reset whenever the settled search changes.
   const [dismissedAuto, setDismissedAuto] = createSignal<readonly string[]>([]);
   const [settledSearch, setSettledSearch] = createSignal(options.initialSearch);
 
-  createEffect(() => {
-    const query = options.search();
-    const timer = setTimeout(() => {
-      // Only a changed query clears dismissals; the initial run must not undo
-      // a collapse made right after loading a shared ?q= link.
-      if (query === settledSearch()) return;
+  createEffect(
+    () => options.search(),
+    (query) => {
+      const timer = setTimeout(() => {
+        // Only a changed query clears dismissals; the initial run must not undo
+        // a collapse made right after loading a shared ?q= link.
+        if (query === settledSearch()) return;
 
-      setSettledSearch(query);
-      setDismissedAuto([]);
-    }, AUTO_EXPAND_DELAY_MS);
-    onCleanup(() => {
-      clearTimeout(timer);
-    });
-  });
+        setSettledSearch(query);
+        setDismissedAuto([]);
+      }, AUTO_EXPAND_DELAY_MS);
+      return () => {
+        clearTimeout(timer);
+      };
+    },
+  );
 
   const autoExpanded = createMemo<readonly string[]>(() => {
     const query = options.search();
@@ -65,6 +66,21 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
     return query.trim().length === 0 || query !== settledSearch()
       ? []
       : getAutoExpandable(options.filteredSummaries());
+  });
+
+  const visibleMentors = createMemo(
+    () => new Set(options.filteredSummaries().map((summary) => summary.mentor)),
+  );
+
+  // Derived rather than pruned in an effect: an effect that writes a source it
+  // also reads tears the frame in two flushes.
+  const manualExpanded = createMemo<readonly string[]>(() => {
+    const requested = requestedExpanded();
+    // While data is loading or failed, keep URL-provided mentors so they survive.
+    if (!options.isReady()) return requested;
+
+    const visible = visibleMentors();
+    return requested.filter((mentor) => visible.has(mentor));
   });
 
   const expandedMentors = createMemo(() => {
@@ -80,23 +96,9 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
   const expandedSet = createMemo(() => new Set(expandedMentors()));
   const isExpanded = (mentor: string) => expandedSet().has(mentor);
 
-  createEffect(() => {
-    const manual = manualExpanded();
-    if (manual.length === 0 || !options.isReady()) return;
-
-    const visible = new Set(
-      options.filteredSummaries().map((summary) => summary.mentor),
-    );
-    const stillVisible = manual.filter((mentor) => visible.has(mentor));
-
-    if (stillVisible.length !== manual.length) {
-      setManualExpanded(stillVisible);
-    }
-  });
-
   const toggleExpanded = (mentor: string) => {
     if (isExpanded(mentor)) {
-      setManualExpanded((previous) =>
+      setRequestedExpanded((previous) =>
         previous.filter((current) => current !== mentor),
       );
       if (autoExpanded().includes(mentor)) {
@@ -110,7 +112,7 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
     setDismissedAuto((previous) =>
       previous.filter((current) => current !== mentor),
     );
-    setManualExpanded((previous) => [...previous, mentor]);
+    setRequestedExpanded((previous) => [...previous, mentor]);
   };
 
   return { expandedMentors, isExpanded, manualExpanded, toggleExpanded };

@@ -1,4 +1,7 @@
-import { type ComponentProps, splitProps } from 'solid-js';
+import type { ClassValue } from 'clsx';
+
+import { type ComponentProps } from '@solidjs/web';
+import { omit } from 'solid-js';
 
 import { cn } from '@/lib/cn';
 
@@ -23,7 +26,7 @@ const sizeClasses: Record<ButtonSize, string> = {
 
 export const buttonVariants = (
   options: {
-    class?: string;
+    class?: ClassValue;
     size?: ButtonSize;
     variant?: ButtonVariant;
   } = {},
@@ -41,16 +44,16 @@ export type ButtonProps = ComponentProps<'button'> & {
 };
 
 export const Button = (props: ButtonProps) => {
-  const [local, rest] = splitProps(props, ['class', 'size', 'type', 'variant']);
+  const rest = omit(props, 'class', 'size', 'type', 'variant');
 
   return (
     <button
       class={buttonVariants({
-        class: local.class,
-        size: local.size,
-        variant: local.variant,
+        class: props.class,
+        size: props.size,
+        variant: props.variant,
       })}
-      type={local.type ?? 'button'}
+      type={props.type ?? 'button'}
       {...rest}
     />
   );

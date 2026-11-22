@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-solid';
+import { ChevronRight } from '@lucide/solid';
 import { createUniqueId, Show } from 'solid-js';
 
 import { TableCell, TableRow } from '@/components/ui/table';
@@ -32,7 +32,7 @@ const MentorRow = (props: MentorListItemProps) => {
         <TableCell class="font-medium">
           <button
             aria-controls={props.expanded ? detailsId : undefined}
-            aria-expanded={props.expanded}
+            aria-expanded={props.expanded ? 'true' : 'false'}
             class="flex max-w-full cursor-pointer items-center gap-2 rounded-sm text-left ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             type="button"
           >
@@ -65,7 +65,7 @@ const MentorRow = (props: MentorListItemProps) => {
         <TableRow class="hover:bg-transparent">
           <TableCell
             class="p-0 whitespace-normal"
-            colSpan={props.showRank ? 4 : 3}
+            colspan={props.showRank ? 4 : 3}
             id={detailsId}
           >
             <DiplomaDetailsTable

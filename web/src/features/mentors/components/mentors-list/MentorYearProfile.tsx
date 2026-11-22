@@ -1,9 +1,10 @@
+import type { JSX } from '@solidjs/web';
+
 import {
   type Accessor,
   createContext,
   createMemo,
   For,
-  type JSX,
   Show,
   useContext,
 } from 'solid-js';
@@ -40,11 +41,9 @@ export const YearProfileProvider = (props: {
   // The resolver is a stable function for the page's lifetime.
   const getStatusTone = (status: string) => props.getStatusTone(status);
   return (
-    <YearProfileContext.Provider
-      value={{ committeeCounts, getStatusTone, years }}
-    >
+    <YearProfileContext value={{ committeeCounts, getStatusTone, years }}>
       {props.children}
-    </YearProfileContext.Provider>
+    </YearProfileContext>
   );
 };
 
@@ -63,9 +62,7 @@ const MentorYearProfile = (props: {
   const context = useContext(YearProfileContext);
 
   const stats = createMemo(() =>
-    context
-      ? countByYear(props.diplomas, context.getStatusTone, context.years())
-      : null,
+    countByYear(props.diplomas, context.getStatusTone, context.years()),
   );
   const byTone = createMemo(() => {
     const totals: Record<StatusTone, number> = {
@@ -74,7 +71,7 @@ const MentorYearProfile = (props: {
       progress: 0,
       unknown: 0,
     };
-    const years = stats()?.years ?? [];
+    const years = stats().years;
     for (const entry of years) {
       for (const tone of TONES) totals[tone] += entry.byTone[tone];
     }
@@ -123,7 +120,7 @@ const MentorYearProfile = (props: {
                   </span>
                 )}
               </For>
-              <Show when={context?.committeeCounts().get(props.mentor)}>
+              <Show when={context.committeeCounts().get(props.mentor)}>
                 {(count) => (
                   <span>
                     {interpolate(t().mentorCommittee, {

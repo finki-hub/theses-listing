@@ -1,5 +1,5 @@
-import { ArrowUp } from 'lucide-solid';
-import { createSignal, onCleanup, onMount } from 'solid-js';
+import { ArrowUp } from '@lucide/solid';
+import { createSignal, onSettled } from 'solid-js';
 
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/cn';
@@ -17,7 +17,7 @@ export default function BackToTop() {
   const { t } = useLanguage();
   const [visible, setVisible] = createSignal(false);
 
-  onMount(() => {
+  onSettled(() => {
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -29,15 +29,15 @@ export default function BackToTop() {
 
     update();
     addEventListener('scroll', onScroll, { passive: true });
-    onCleanup(() => {
+    return () => {
       removeEventListener('scroll', onScroll);
       cancelAnimationFrame(frame);
-    });
+    };
   });
 
   return (
     <button
-      aria-hidden={!visible()}
+      aria-hidden={visible() ? 'false' : 'true'}
       aria-label={t().backToTop}
       class={cn(
         buttonVariants({ size: 'icon', variant: 'outline' }),
@@ -50,7 +50,7 @@ export default function BackToTop() {
           top: 0,
         });
       }}
-      tabIndex={visible() ? 0 : -1}
+      tabindex={visible() ? 0 : -1}
       title={t().backToTop}
       type="button"
     >

@@ -1,5 +1,5 @@
-import { Search, X } from 'lucide-solid';
-import { onCleanup, onMount, Show } from 'solid-js';
+import { Search, X } from '@lucide/solid';
+import { onSettled, Show } from 'solid-js';
 
 import { Input } from '@/components/ui/input';
 import { useLanguage } from '@/lib/LanguageProvider';
@@ -36,11 +36,11 @@ const MentorsSearchInput = (props: MentorsSearchInputProps) => {
     inputRef?.select();
   };
 
-  onMount(() => {
+  onSettled(() => {
     document.addEventListener('keydown', onKeyDown);
-    onCleanup(() => {
+    return () => {
       document.removeEventListener('keydown', onKeyDown);
-    });
+    };
   });
 
   return (
@@ -70,7 +70,7 @@ const MentorsSearchInput = (props: MentorsSearchInputProps) => {
         ref={(element) => {
           inputRef = element;
         }}
-        spellcheck={false}
+        spellcheck="false"
         type="search"
         value={props.value}
       />

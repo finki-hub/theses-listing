@@ -1,9 +1,10 @@
+import type { JSX } from '@solidjs/web';
+
 import {
   type Accessor,
   createContext,
   createMemo,
   For,
-  type JSX,
   Show,
   useContext,
 } from 'solid-js';
@@ -18,9 +19,7 @@ export const SearchQueryProvider = (props: {
 }) => {
   const query = createMemo(() => props.query);
   return (
-    <SearchQueryContext.Provider value={query}>
-      {props.children}
-    </SearchQueryContext.Provider>
+    <SearchQueryContext value={query}>{props.children}</SearchQueryContext>
   );
 };
 

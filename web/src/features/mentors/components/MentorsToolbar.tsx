@@ -1,4 +1,4 @@
-import { FilterX } from 'lucide-solid';
+import { FilterX } from '@lucide/solid';
 import { createUniqueId, For, Show } from 'solid-js';
 
 import { Button } from '@/components/ui/button';

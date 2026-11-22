@@ -127,36 +127,40 @@ export const createSearchAnalytics = (options: SearchAnalyticsOptions) => {
     schedule(intent, kind);
   };
 
-  createEffect(() => {
-    const intent = currentIntent();
-    const count = options.count();
-    const active = options.active();
-    const ready = options.ready();
-    initialIntent ??= intent;
+  createEffect(
+    () => ({
+      active: options.active(),
+      count: options.count(),
+      intent: currentIntent(),
+      ready: options.ready(),
+    }),
+    ({ active, count, intent, ready }) => {
+      initialIntent ??= intent;
 
-    if (wasReady && !ready && settled) refreshPending = true;
-    wasReady = ready;
+      if (wasReady && !ready && settled) refreshPending = true;
+      wasReady = ready;
 
-    if (!active || !ready) {
-      clearTimer();
-      return;
-    }
+      if (!active || !ready) {
+        clearTimer();
+        return;
+      }
 
-    const matchesSettled =
-      settled !== undefined &&
-      hasSameIntent(settled.intent, intent) &&
-      settled.count === count;
+      const matchesSettled =
+        settled !== undefined &&
+        hasSameIntent(settled.intent, intent) &&
+        settled.count === count;
 
-    if (!needsAttempt(intent, count)) {
-      if (pendingTimer?.kind === 'search') clearTimer();
-      // A canceled transient edit restores the last settled UUID immediately.
-      if (matchesSettled && !refreshPending && settled)
-        settled = { count: settled.count, id: settled.id, intent };
-      return;
-    }
+      if (!needsAttempt(intent, count)) {
+        if (pendingTimer?.kind === 'search') clearTimer();
+        // A canceled transient edit restores the last settled UUID immediately.
+        if (matchesSettled && !refreshPending && settled)
+          settled = { count: settled.count, id: settled.id, intent };
+        return;
+      }
 
-    scheduleForIntent(intent, count);
-  });
+      scheduleForIntent(intent, count);
+    },
+  );
 
   onCleanup(() => {
     disposed = true;

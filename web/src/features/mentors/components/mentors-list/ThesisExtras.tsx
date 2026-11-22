@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-solid';
+import { ChevronDown } from '@lucide/solid';
 import { createSignal, createUniqueId, For, Show } from 'solid-js';
 
 import type { Diploma } from '@/types';
@@ -51,7 +51,7 @@ const ThesisExtras = (props: ThesisExtrasProps) => {
       <Show when={abstract().length > 0}>
         <button
           aria-controls={showAbstract() ? abstractId : undefined}
-          aria-expanded={showAbstract()}
+          aria-expanded={showAbstract() ? 'true' : 'false'}
           class="mt-1 inline-flex cursor-pointer items-center gap-1 rounded-sm text-xs font-medium text-primary ring-offset-background hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           onClick={() => setShowAbstract((open) => !open)}
           type="button"

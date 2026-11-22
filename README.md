@@ -8,7 +8,7 @@ A web dashboard for browsing bachelor's and master's theses and their mentors at
 
 ## Development
 
-Install Node.js and npm. From the repository root, install dependencies and start the web app:
+Install Node.js 22.12 or newer (required by Vite 8 and Solid 2) and npm. From the repository root, install dependencies and start the web app:
 
 ```sh
 npm ci
