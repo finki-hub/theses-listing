@@ -29,7 +29,11 @@ const InProgressCount = (props: { count: number; withLabel?: boolean }) => {
         )}
       />
       <Show
-        fallback={value()}
+        fallback={
+          // Fixed numeric track keeps the dot on one vertical line across
+          // rows while the digits stay right-aligned under the header.
+          <span class="min-w-5 text-right">{value()}</span>
+        }
         when={props.withLabel}
       >
         {interpolate(t().inProgressCount, { count: value() })}

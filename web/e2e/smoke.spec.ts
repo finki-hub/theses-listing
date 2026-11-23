@@ -1,5 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 
+import type { Diploma } from '../src/types';
+
 import { createLongCatalog, mockCatalogs, useEnglish } from './fixtures';
 
 const ANA = 'Ana Petrovska';
@@ -348,3 +350,54 @@ test('restores filter controls from a deep link', async ({ page }) => {
     '2019',
   );
 });
+
+const progressTheses = (mentor: string, count: number): Diploma[] =>
+  Array.from({ length: count }, (_, index) => ({
+    dateOfSubmission: '01.06.2026',
+    description: `Progress thesis ${index}`,
+    fileId: null,
+    member1: 'Member one',
+    member2: 'Member two',
+    mentor,
+    status: 'Пријава',
+    student: `Student ${index}`,
+    title: `Progress thesis ${index}`,
+  }));
+
+/* eslint-disable sonarjs/no-skipped-tests -- Desktop-only alignment assertion; the mobile card uses the labeled variant. */
+test('aligns the in-progress dots across digit counts', async ({
+  isMobile,
+  page,
+}) => {
+  test.skip(isMobile, 'desktop table only');
+
+  await useEnglish(page);
+  await mockCatalogs(page, {
+    diplomas: [
+      ...progressTheses('Mentor Six', 6),
+      ...progressTheses('Mentor Fifteen', 15),
+    ],
+  });
+  await page.goto('/');
+
+  const dotX = async (mentor: string) => {
+    const row = page.getByRole('row').filter({ hasText: mentor });
+    const box = await row
+      .locator('td.text-right')
+      .first()
+      .locator('[aria-hidden="true"]')
+      .first()
+      .boundingBox();
+    return box?.x ?? NaN;
+  };
+
+  const [six, fifteen] = await Promise.all([
+    dotX('Mentor Six'),
+    dotX('Mentor Fifteen'),
+  ]);
+
+  expect(Number.isFinite(six)).toBe(true);
+  expect(Number.isFinite(fifteen)).toBe(true);
+  expect(Math.abs(six - fifteen)).toBeLessThan(1);
+});
+/* eslint-enable sonarjs/no-skipped-tests -- Re-enable after the desktop-only test. */
