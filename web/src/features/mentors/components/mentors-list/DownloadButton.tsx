@@ -1,4 +1,4 @@
-import { Download, LoaderCircle } from 'lucide-solid';
+import { Download, LoaderCircle } from '@lucide/solid';
 import { createSignal, Show } from 'solid-js';
 import { toast } from 'solid-sonner';
 
@@ -38,7 +38,7 @@ const DownloadButton = (
 
   return (
     <button
-      aria-disabled={isLoading()}
+      aria-disabled={isLoading() ? 'true' : 'false'}
       aria-label={props.url === null ? t().fileMissing : t().download}
       class={cn(
         'inline-flex items-center justify-center rounded-md p-1.5 ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',

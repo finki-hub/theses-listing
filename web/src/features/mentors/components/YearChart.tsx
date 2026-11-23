@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-solid';
+import { ChevronDown } from '@lucide/solid';
 import { createSignal, createUniqueId, For, Show } from 'solid-js';
 
 import { Card } from '@/components/ui/card';
@@ -177,7 +177,7 @@ const Plot = (props: YearChartProps) => {
                 return (
                   <button
                     aria-label={`${entry.year === currentYear ? interpolate(t().yearSoFar, { year: entry.year }) : entry.year}: ${formatNumber(entry.total, language())}`}
-                    aria-pressed={selected()}
+                    aria-pressed={selected() ? 'true' : 'false'}
                     class="group flex h-full min-w-0 flex-1 cursor-pointer items-end justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     disabled={entry.total === 0}
                     onBlur={() => setActive(null)}
@@ -259,7 +259,7 @@ const YearChart = (props: YearChartProps) => {
       <Card class="mb-6 gap-0 py-0">
         <button
           aria-controls={panelId}
-          aria-expanded={open()}
+          aria-expanded={open() ? 'true' : 'false'}
           class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-5"
           onClick={() => {
             const next = !open();

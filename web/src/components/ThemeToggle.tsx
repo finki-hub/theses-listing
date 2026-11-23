@@ -1,5 +1,5 @@
-import { Monitor, Moon, Sun } from 'lucide-solid';
-import { createSignal, Match, onCleanup, onMount, Switch } from 'solid-js';
+import { Monitor, Moon, Sun } from '@lucide/solid';
+import { createSignal, Match, onSettled, Switch } from 'solid-js';
 
 import { Button } from '@/components/ui/button';
 import { interpolate } from '@/lib/i18n';
@@ -70,20 +70,18 @@ const storePreference = (next: ThemePreference) => {
 export default function ThemeToggle() {
   const { t } = useLanguage();
 
-  onMount(() => {
+  onSettled(() => {
     applyTheme(resolveTheme(preference()));
 
     const query = darkQuery();
-    if (!query) return;
-
     const onSystemChange = () => {
       if (preference() === 'system') applyTheme(getSystemTheme());
     };
 
-    query.addEventListener('change', onSystemChange);
-    onCleanup(() => {
-      query.removeEventListener('change', onSystemChange);
-    });
+    query?.addEventListener('change', onSystemChange);
+    return () => {
+      query?.removeEventListener('change', onSystemChange);
+    };
   });
 
   const cycle = () => {

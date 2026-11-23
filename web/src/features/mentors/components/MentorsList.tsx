@@ -105,7 +105,7 @@ const MentorsList = (props: MentorsListProps) => {
                 <TableRow class="hover:bg-transparent">
                   <TableCell
                     class="whitespace-normal"
-                    colSpan={isCountSort(props.sortField) ? 4 : 3}
+                    colspan={isCountSort(props.sortField) ? 4 : 3}
                   >
                     <EmptyState
                       hasActiveFilters={props.hasActiveFilters}

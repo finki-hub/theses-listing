@@ -1,7 +1,4 @@
-/* eslint-disable jsdoc/check-tag-names -- Solid Refresh uses the @refresh marker consumed by vite-plugin-solid. */
-/** @refresh reload */
-/* eslint-enable jsdoc/check-tag-names -- Re-enable after the Solid Refresh marker. */
-import { render } from 'solid-js/web';
+import { render } from '@solidjs/web';
 import '@fontsource-variable/inter';
 
 import './app.css';

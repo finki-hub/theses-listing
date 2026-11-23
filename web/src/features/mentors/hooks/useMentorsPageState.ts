@@ -3,10 +3,10 @@ import {
   type Accessor,
   createEffect,
   createMemo,
-  createResource,
   createSignal,
   onCleanup,
   type Setter,
+  untrack,
 } from 'solid-js';
 
 import type { Language } from '@/lib/i18n';
@@ -58,60 +58,73 @@ const getLastUpdatedAt = (result: CatalogResult): null | string =>
 const createThesesResource = (options: ThesesResourceOptions) => {
   let generation = 0;
   let requestNumber = 0;
-  let nextIsRetry = false;
   let disposed = false;
+  const [items, setItems] = createSignal<Diploma[] | undefined>();
+  const [loading, setLoading] = createSignal(true);
+  const [hasLoadedOnce, setHasLoadedOnce] = createSignal(false);
   onCleanup(() => {
     disposed = true;
     generation += 1;
   });
-  const [resource, actions] = createResource<Diploma[]>(
-    // Resource settlement retains existing fallback/error behavior and reports only terminal states.
-    // eslint-disable-next-line sonarjs/cognitive-complexity -- The fetcher must preserve its business error path.
-    async (_source, info) => {
-      generation += 1;
-      const currentGeneration = generation;
-      requestNumber += 1;
-      const requestNumberAtStart = requestNumber;
-      const trigger = nextIsRetry ? 'retry' : 'initial';
-      nextIsRetry = false;
-      options.setLoadError(null);
 
-      try {
-        const result = await options.config.fetchTheses();
-        if (!disposed && currentGeneration === generation) {
-          captureAnalytics('catalog_load_result', {
-            outcome: result.stale ? 'stale' : 'fresh',
-            section: options.config.id,
-            trigger: requestNumberAtStart === 1 ? 'initial' : trigger,
-          });
-        }
+  // Settlement retains existing fallback/error behavior and reports only terminal states.
+
+  const load = async (isRetry: boolean) => {
+    generation += 1;
+    const currentGeneration = generation;
+    requestNumber += 1;
+    const requestNumberAtStart = requestNumber;
+    const trigger =
+      requestNumberAtStart === 1 || !isRetry ? 'initial' : 'retry';
+    const retained = untrack(items);
+    options.setLoadError(null);
+    setLoading(true);
+
+    try {
+      const result = await options.config.fetchTheses();
+      if (!disposed && currentGeneration === generation) {
+        captureAnalytics('catalog_load_result', {
+          outcome: result.stale ? 'stale' : 'fresh',
+          section: options.config.id,
+          trigger,
+        });
         options.setIsStale(result.stale);
         options.setLastUpdatedAt(getLastUpdatedAt(result));
-        return result.items;
-      } catch (error) {
-        if (!disposed && currentGeneration === generation) {
-          captureAnalytics('catalog_load_result', {
-            outcome: 'error',
-            retained_data: info.value !== undefined,
-            section: options.config.id,
-            trigger: requestNumberAtStart === 1 ? 'initial' : trigger,
-          });
-        }
+        setItems(result.items);
+        setHasLoadedOnce(true);
+      }
+    } catch (error) {
+      if (!disposed && currentGeneration === generation) {
+        captureAnalytics('catalog_load_result', {
+          outcome: 'error',
+          retained_data: retained !== undefined,
+          section: options.config.id,
+          trigger,
+        });
         options.setLoadError(
           error instanceof Error
             ? error
             : new Error('Catalog request failed', { cause: error }),
         );
-
-        return info.value ?? [];
+        setItems(retained ?? []);
       }
+    } finally {
+      if (!disposed && currentGeneration === generation) setLoading(false);
+    }
+  };
+
+  // The initial fetch starts from an effect's apply phase: writing signals in
+  // the component body is an owned-scope write in Solid 2.
+  createEffect(
+    () => options.config.id,
+    () => {
+      void load(false);
     },
   );
-  const refetch = (...args: Parameters<typeof actions.refetch>) => {
-    nextIsRetry = true;
-    return actions.refetch(...args);
-  };
-  return [resource, { ...actions, refetch }] as const;
+
+  const resource = Object.assign(() => items(), { loading });
+  const refetch = () => load(true);
+  return [resource, { hasLoadedOnce, refetch }] as const;
 };
 
 // Whole-section statistics; like the stats cards, they ignore the filters.
@@ -151,12 +164,13 @@ export const useMentorsPageState = (
   const [isStale, setIsStale] = createSignal(false);
   const [lastUpdatedAt, setLastUpdatedAt] = createSignal<null | string>(null);
   const [loadError, setLoadError] = createSignal<Error | null>(null);
-  const [diplomas, { refetch: refetchDiplomas }] = createThesesResource({
-    config,
-    setIsStale,
-    setLastUpdatedAt,
-    setLoadError,
-  });
+  const [diplomas, { hasLoadedOnce, refetch: refetchDiplomas }] =
+    createThesesResource({
+      config,
+      setIsStale,
+      setLastUpdatedAt,
+      setLoadError,
+    });
   const [search, setSearch] = createSignal(initialState.search);
   const [statusFilter, setStatusFilter] = createSignal(
     initialState.statusFilter,
@@ -249,16 +263,16 @@ export const useMentorsPageState = (
     autoExpandedCount: () => countAutoExpandable(filteredSummaries()),
     count: () => filteredSummaries().length,
     intent: searchIntent,
-    ready: () => !diplomas.loading && loadError() === null,
+    ready: () => !diplomas.loading() && loadError() === null,
     section: config.id,
   });
 
   const { expandedMentors, isExpanded, manualExpanded, toggleExpanded } =
     createMentorExpansion({
       filteredSummaries,
+      hasLoadedOnce,
       initialExpanded: initialState.expandedMentors,
       initialSearch: initialState.search,
-      isReady: () => !diplomas.loading && loadError() === null,
       onOpen: (mentor) => {
         searchAnalytics.captureResultClick(
           filteredSummaries().findIndex((summary) => summary.mentor === mentor),
@@ -267,16 +281,19 @@ export const useMentorsPageState = (
       search,
     });
 
-  createEffect(() => {
-    syncMentorsSearchParams({
+  createEffect(
+    () => ({
       expandedMentors: manualExpanded(),
       search: search(),
       sortDirection: sortDirection(),
       sortField: sortField(),
       statusFilter: statusFilter(),
       yearFilter: yearFilter(),
-    });
-  });
+    }),
+    (params) => {
+      syncMentorsSearchParams(params);
+    },
+  );
 
   const getCountShare = (count: number) => count / maxDiplomas();
 

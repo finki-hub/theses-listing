@@ -1,4 +1,4 @@
-import { Link } from 'lucide-solid';
+import { Link } from '@lucide/solid';
 import { For, Show } from 'solid-js';
 import { toast } from 'solid-sonner';
 

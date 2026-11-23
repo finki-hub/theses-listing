@@ -15,7 +15,7 @@ type SortButtonProps = {
 
 const SortButton = (props: SortButtonProps) => (
   <button
-    aria-pressed={props.sortField === props.field}
+    aria-pressed={props.sortField === props.field ? 'true' : 'false'}
     class={`inline-flex h-8 cursor-pointer items-center rounded-full border px-3 text-sm transition-colors ${
       props.sortField === props.field
         ? 'border-primary/40 bg-primary/10 text-foreground'

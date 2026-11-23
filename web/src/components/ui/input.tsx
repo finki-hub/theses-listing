@@ -1,4 +1,5 @@
-import { type ComponentProps, splitProps } from 'solid-js';
+import { type ComponentProps } from '@solidjs/web';
+import { omit } from 'solid-js';
 
 import { cn } from '@/lib/cn';
 
@@ -8,11 +9,11 @@ const controlClass =
 export type InputProps = ComponentProps<'input'>;
 
 export const Input = (props: InputProps) => {
-  const [local, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <input
-      class={cn(controlClass, local.class)}
+      class={cn(controlClass, props.class)}
       {...rest}
     />
   );
@@ -21,11 +22,11 @@ export const Input = (props: InputProps) => {
 export type NativeSelectProps = ComponentProps<'select'>;
 
 export const NativeSelect = (props: NativeSelectProps) => {
-  const [local, rest] = splitProps(props, ['class']);
+  const rest = omit(props, 'class');
 
   return (
     <select
-      class={cn(controlClass, 'cursor-pointer pr-2', local.class)}
+      class={cn(controlClass, 'cursor-pointer pr-2', props.class)}
       {...rest}
     />
   );

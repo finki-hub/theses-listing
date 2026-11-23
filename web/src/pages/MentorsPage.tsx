@@ -1,6 +1,6 @@
+import { RefreshCw, TriangleAlert } from '@lucide/solid';
 import { useLocation } from '@solidjs/router';
-import { RefreshCw, TriangleAlert } from 'lucide-solid';
-import { createEffect, Show } from 'solid-js';
+import { createEffect, Show, untrack } from 'solid-js';
 
 import BackToTop from '@/components/BackToTop';
 import { Button } from '@/components/ui/button';
@@ -33,12 +33,21 @@ export default function MentorsPage(props: MentorsPageProps) {
   const { language, t } = useLanguage();
   const location = useLocation();
   const strings = () => t().sections[props.config.id];
-  // eslint-disable-next-line solid/reactivity -- Each section reads its config and initial URL state once per mount.
-  const state = useMentorsPageState(props.config, language, location.search);
 
-  createEffect(() => {
-    updatePageMetadata(language(), props.config.id, document);
-  });
+  /* eslint-disable solid/reactivity -- Each section reads its config and initial URL state once per mount. */
+  const state = useMentorsPageState(
+    props.config,
+    language,
+    untrack(() => location.search),
+  );
+  /* eslint-enable solid/reactivity -- Re-enable after the one-time mount read. */
+
+  createEffect(
+    () => [language(), props.config.id] as const,
+    ([currentLanguage, section]) => {
+      updatePageMetadata(currentLanguage, section, document);
+    },
+  );
 
   return (
     <div class="min-h-screen bg-background">
@@ -55,7 +64,7 @@ export default function MentorsPage(props: MentorsPageProps) {
 
         <MentorsStatsCards
           // Keep showing the previous numbers while a retry refetches.
-          loading={state.diplomas.loading && state.totalDiplomasCount() === 0}
+          loading={state.diplomas.loading() && state.totalDiplomasCount() === 0}
           median={state.medianDiplomas()}
           section={props.config.id}
           topTenDiplomasCount={state.topTenDiplomasCount()}
@@ -70,7 +79,7 @@ export default function MentorsPage(props: MentorsPageProps) {
         </Show>
 
         <YearChart
-          loading={state.diplomas.loading && state.totalDiplomasCount() === 0}
+          loading={state.diplomas.loading() && state.totalDiplomasCount() === 0}
           onSelectYear={state.setYearFilter}
           selectedYear={state.yearFilter()}
           stats={state.yearStats()}
@@ -105,7 +114,9 @@ export default function MentorsPage(props: MentorsPageProps) {
             />
 
             <Show
-              when={state.diplomas.loading && state.totalDiplomasCount() === 0}
+              when={
+                state.diplomas.loading() && state.totalDiplomasCount() === 0
+              }
             >
               <ListSkeleton />
             </Show>
@@ -119,14 +130,14 @@ export default function MentorsPage(props: MentorsPageProps) {
                 <output class="flex-1">{t().staleWarning}</output>
                 <Button
                   class="h-8 border-amber-500/40 bg-transparent text-current hover:bg-amber-500/15"
-                  disabled={state.diplomas.loading}
+                  disabled={state.diplomas.loading()}
                   onClick={() => state.refetchDiplomas()}
                   size="sm"
                   variant="outline"
                 >
                   <RefreshCw
                     aria-hidden="true"
-                    class={`size-4 ${state.diplomas.loading ? 'animate-spin' : ''}`}
+                    class={`size-4 ${state.diplomas.loading() ? 'animate-spin' : ''}`}
                   />
                   {t().retry}
                 </Button>
@@ -141,7 +152,7 @@ export default function MentorsPage(props: MentorsPageProps) {
                 <span>{t().loadError}</span>
                 <Button
                   class="border-destructive/30 text-foreground"
-                  disabled={state.diplomas.loading}
+                  disabled={state.diplomas.loading()}
                   onClick={() => state.refetchDiplomas()}
                   size="sm"
                   variant="outline"
@@ -158,7 +169,7 @@ export default function MentorsPage(props: MentorsPageProps) {
             <Show
               when={
                 state.loadError() === null &&
-                (!state.diplomas.loading || state.totalDiplomasCount() > 0)
+                (!state.diplomas.loading() || state.totalDiplomasCount() > 0)
               }
             >
               <SearchQueryProvider query={state.search()}>

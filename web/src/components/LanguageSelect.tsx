@@ -1,5 +1,5 @@
 import { Select } from '@kobalte/core/select';
-import { Check, ChevronDown, Globe } from 'lucide-solid';
+import { Check, ChevronDown, Globe } from '@lucide/solid';
 import { createUniqueId } from 'solid-js';
 
 import { isLanguage, type Language, languageNames } from '@/lib/i18n';

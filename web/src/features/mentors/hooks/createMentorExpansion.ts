@@ -3,7 +3,6 @@ import {
   createEffect,
   createMemo,
   createSignal,
-  onCleanup,
 } from 'solid-js';
 
 import type { FilteredMentorSummary } from '../types';
@@ -26,38 +25,41 @@ export const countAutoExpandable = (
 
 type MentorExpansionOptions = {
   readonly filteredSummaries: Accessor<FilteredMentorSummary[]>;
+  // True after the first successful catalog load; until then, URL-provided
+  // mentors must survive the initial fetch.
+  readonly hasLoadedOnce: Accessor<boolean>;
   readonly initialExpanded: readonly string[];
   readonly initialSearch: string;
-  // False while data is loading or failed, so URL-provided mentors survive.
-  readonly isReady: Accessor<boolean>;
   readonly onOpen: (mentor: string) => void;
   readonly search: Accessor<string>;
 };
 
 export const createMentorExpansion = (options: MentorExpansionOptions) => {
-  // Mentors the user opened explicitly; these are kept in the URL.
-  const [manualExpanded, setManualExpanded] = createSignal<readonly string[]>(
-    options.initialExpanded,
-  );
+  // Mentors the user opened explicitly; the URL keeps the visible subset.
+  const [requestedExpanded, setRequestedExpanded] = createSignal<
+    readonly string[]
+  >(options.initialExpanded);
   // Mentors the user closed while they were auto-expanded for the current
   // search; reset whenever the settled search changes.
   const [dismissedAuto, setDismissedAuto] = createSignal<readonly string[]>([]);
   const [settledSearch, setSettledSearch] = createSignal(options.initialSearch);
 
-  createEffect(() => {
-    const query = options.search();
-    const timer = setTimeout(() => {
-      // Only a changed query clears dismissals; the initial run must not undo
-      // a collapse made right after loading a shared ?q= link.
-      if (query === settledSearch()) return;
+  createEffect(
+    () => options.search(),
+    (query) => {
+      const timer = setTimeout(() => {
+        // Only a changed query clears dismissals; the initial run must not undo
+        // a collapse made right after loading a shared ?q= link.
+        if (query === settledSearch()) return;
 
-      setSettledSearch(query);
-      setDismissedAuto([]);
-    }, AUTO_EXPAND_DELAY_MS);
-    onCleanup(() => {
-      clearTimeout(timer);
-    });
-  });
+        setSettledSearch(query);
+        setDismissedAuto([]);
+      }, AUTO_EXPAND_DELAY_MS);
+      return () => {
+        clearTimeout(timer);
+      };
+    },
+  );
 
   const autoExpanded = createMemo<readonly string[]>(() => {
     const query = options.search();
@@ -65,6 +67,25 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
     return query.trim().length === 0 || query !== settledSearch()
       ? []
       : getAutoExpandable(options.filteredSummaries());
+  });
+
+  const visibleMentors = createMemo(
+    () => new Set(options.filteredSummaries().map((summary) => summary.mentor)),
+  );
+
+  // Manual expansions are explicit user intent: a mentor hidden by a filter is
+  // omitted from the URL and the view, then restored when the filter stops
+  // hiding it. Pruning it permanently would require an effect that writes the
+  // source it reads, which Solid 2 rejects (`EFFECT_WRITES_OWN_SOURCE`).
+  const manualExpanded = createMemo<readonly string[]>(() => {
+    const requested = requestedExpanded();
+    // Until the first successful load, keep URL-provided mentors so they
+    // survive it. Afterwards always filter, including during a refetch or an
+    // error, so a hidden mentor is not written back into the URL.
+    if (!options.hasLoadedOnce()) return requested;
+
+    const visible = visibleMentors();
+    return requested.filter((mentor) => visible.has(mentor));
   });
 
   const expandedMentors = createMemo(() => {
@@ -80,23 +101,9 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
   const expandedSet = createMemo(() => new Set(expandedMentors()));
   const isExpanded = (mentor: string) => expandedSet().has(mentor);
 
-  createEffect(() => {
-    const manual = manualExpanded();
-    if (manual.length === 0 || !options.isReady()) return;
-
-    const visible = new Set(
-      options.filteredSummaries().map((summary) => summary.mentor),
-    );
-    const stillVisible = manual.filter((mentor) => visible.has(mentor));
-
-    if (stillVisible.length !== manual.length) {
-      setManualExpanded(stillVisible);
-    }
-  });
-
   const toggleExpanded = (mentor: string) => {
     if (isExpanded(mentor)) {
-      setManualExpanded((previous) =>
+      setRequestedExpanded((previous) =>
         previous.filter((current) => current !== mentor),
       );
       if (autoExpanded().includes(mentor)) {
@@ -110,7 +117,7 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
     setDismissedAuto((previous) =>
       previous.filter((current) => current !== mentor),
     );
-    setManualExpanded((previous) => [...previous, mentor]);
+    setRequestedExpanded((previous) => [...previous, mentor]);
   };
 
   return { expandedMentors, isExpanded, manualExpanded, toggleExpanded };

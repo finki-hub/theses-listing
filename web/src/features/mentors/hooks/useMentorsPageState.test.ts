@@ -1,5 +1,5 @@
 /* eslint-disable camelcase -- Assert the telemetry protocol. */
-import { type Accessor, createRoot, createSignal } from 'solid-js';
+import { type Accessor, createRoot, createSignal, flush } from 'solid-js';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { Language } from '@/lib/i18n';
@@ -126,13 +126,16 @@ const defineSearchAndSelectionTests = () => {
     });
     expect(typeof properties?.['search_attempt_id']).toBe('string');
     state.toggleExpanded('Mentor');
+    flush();
     expect(captureAnalytics).toHaveBeenLastCalledWith('result_clicked', {
       position: 0,
       search_attempt_id: properties?.['search_attempt_id'],
       section: 'diplomas',
     });
     state.toggleExpanded('Mentor');
+    flush();
     state.setSearch('Men');
+    flush();
     state.toggleExpanded('Mentor');
     expect(captureAnalytics).toHaveBeenLastCalledWith('result_clicked', {
       position: 0,
@@ -172,6 +175,7 @@ const defineSearchAndSelectionTests = () => {
     );
 
     state.toggleExpanded('Mentor');
+    flush();
     expect(state.isExpanded('Mentor')).toBe(false);
 
     state.setSearch('Other');
@@ -241,6 +245,7 @@ const defineCatalogRetryAndSearchAttemptTests = () => {
       .mockRejectedValueOnce(new Error('Catalog unavailable'))
       .mockResolvedValueOnce(createCatalogResult([DIPLOMA]));
     const state = createTestState(fetchTheses);
+    flush();
     await Promise.resolve();
     await Promise.resolve();
     await state.refetchDiplomas();
@@ -256,7 +261,7 @@ const defineCatalogRetryAndSearchAttemptTests = () => {
     await state.refetchDiplomas();
 
     // Then
-    expect(state.diplomas.state).toBe('ready');
+    expect(state.diplomas.loading()).toBe(false);
     expect(state.diplomas()).toEqual([DIPLOMA]);
     expect(state.loadError()).toBeNull();
     expect(fetchTheses).toHaveBeenCalledTimes(3);
@@ -278,6 +283,7 @@ const defineCatalogRetryAndSearchAttemptTests = () => {
     await vi.advanceTimersByTimeAsync(500);
     expect(state.getSearchAttemptId()).toEqual(expect.any(String));
     state.setSearch('Changed');
+    flush();
     expect(state.getSearchAttemptId()).toBeUndefined();
   });
 
@@ -297,9 +303,11 @@ const defineCatalogRetryAndSearchAttemptTests = () => {
       .mocked(captureAnalytics)
       .mock.calls.filter(([event]) => event === 'catalog_search').length;
     state.setSearch('Transient');
+    flush();
     expect(state.getSearchAttemptId()).toBeUndefined();
     await vi.advanceTimersByTimeAsync(200);
     state.setSearch('Student');
+    flush();
     expect(state.getSearchAttemptId()).toBe(initialId);
     await vi.advanceTimersByTimeAsync(500);
     expect(
@@ -341,9 +349,11 @@ const defineRefreshSearchCausalityTests = () => {
 
     await vi.advanceTimersByTimeAsync(200);
     state.setStatusFilter('Transient filter');
+    flush();
     expect(state.getSearchAttemptId()).toBeUndefined();
     await vi.advanceTimersByTimeAsync(100);
     state.setStatusFilter('');
+    flush();
     expect(state.getSearchAttemptId()).toBeUndefined();
     await vi.advanceTimersByTimeAsync(499);
     expect(
@@ -364,6 +374,7 @@ const defineRefreshSearchCausalityTests = () => {
     );
 
     state.setStatusFilter('Settled filter');
+    flush();
     expect(state.getSearchAttemptId()).toBeUndefined();
     await vi.advanceTimersByTimeAsync(500);
     const filteredSearches = vi
@@ -509,6 +520,110 @@ const defineCleanupAndRetainedSelectionTests = () => {
     pending[2]?.(createCatalogResult([]));
     await Promise.resolve();
     expect(captureAnalytics).toHaveBeenCalledTimes(count);
+  });
+
+  it('does not restore a filtered mentor to the URL during a refetch', async () => {
+    const other = {
+      ...DIPLOMA,
+      mentor: 'Other',
+      student: 'Someone',
+      title: 'Other thesis',
+    };
+    const { promise: refetchCatalog, resolve: resolveRefetch } =
+      Promise.withResolvers<CatalogResult>();
+    const fetchTheses = vi
+      .fn<() => Promise<CatalogResult>>()
+      .mockResolvedValueOnce(createCatalogResult([DIPLOMA, other]))
+      .mockImplementationOnce(() => refetchCatalog);
+    const replaceState = stubBrowserLocation('?mentor=Mentor');
+    const state = createTestState(fetchTheses);
+    flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(state.expandedMentors()).toEqual(['Mentor']);
+
+    state.setSearch('Other');
+    flush();
+    await Promise.resolve();
+    expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=Mentor');
+
+    const refresh = state.refetchDiplomas();
+    flush();
+    await Promise.resolve();
+    expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=Mentor');
+
+    resolveRefetch(createCatalogResult([DIPLOMA, other]));
+    await refresh;
+    expect(fetchTheses).toHaveBeenCalledTimes(2);
+  });
+
+  it('restores a manual expansion when a filter stops hiding it', async () => {
+    const other = {
+      ...DIPLOMA,
+      mentor: 'Other',
+      student: 'Someone',
+      title: 'Other thesis',
+    };
+    const fetchTheses = vi.fn(() =>
+      Promise.resolve(createCatalogResult([DIPLOMA, other])),
+    );
+    const replaceState = stubBrowserLocation('?mentor=Mentor');
+    const state = createTestState(fetchTheses);
+    flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(state.isExpanded('Mentor')).toBe(true);
+
+    state.setSearch('Other');
+    flush();
+    await Promise.resolve();
+    expect(state.isExpanded('Mentor')).toBe(false);
+    expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=Mentor');
+
+    state.setSearch('');
+    flush();
+    await Promise.resolve();
+    expect(state.isExpanded('Mentor')).toBe(true);
+    expect(replaceState.mock.calls.at(-1)?.[2]).toContain('mentor=Mentor');
+  });
+
+  it('keeps freshness metadata from the latest overlapping load', async () => {
+    stubBrowserLocation('');
+    const pending: Array<(result: CatalogResult) => void> = [];
+    const state = createTestState(
+      () =>
+        new Promise((resolve) => {
+          pending.push(resolve);
+        }),
+    );
+    await Promise.resolve();
+    expect(pending).toHaveLength(1);
+
+    const refresh = state.refetchDiplomas();
+    await Promise.resolve();
+    expect(pending).toHaveLength(2);
+
+    // The newer request settles first; the superseded one must not overwrite
+    // its data or its freshness metadata.
+    pending[1]?.(
+      createCatalogResult([DIPLOMA], {
+        stale: true,
+        updatedAt: '2026-11-20T10:00:00.000Z',
+      }),
+    );
+    await Promise.resolve();
+    pending[0]?.(
+      createCatalogResult([{ ...DIPLOMA, title: 'Older' }], {
+        stale: false,
+        updatedAt: '2026-11-19T10:00:00.000Z',
+      }),
+    );
+    await Promise.resolve();
+    await refresh;
+
+    expect(state.diplomas()).toEqual([DIPLOMA]);
+    expect(state.isStale()).toBe(true);
+    expect(state.lastUpdatedAt()).toBe('2026-11-20T10:00:00.000Z');
   });
 };
 

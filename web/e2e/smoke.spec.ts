@@ -10,11 +10,16 @@ const EXPANDED_MENTOR_URL = /mentor=Ana\+Petrovska/u;
 const SEARCH_URL = /q=lossless/u;
 const CANCELLED_CHIP = /Cancelled/u;
 const CANCELLED_URL = /status=tone%3Acancelled/u;
+const MASTERS_PATH = /\/masters$/u;
 const MASTERS_URL = /\/masters\?q=medical/u;
 const YEAR_URL = /year=2019/u;
 const IN_PROGRESS_URL = /sort=inProgress/u;
 const RECENT_URL = /year=recent/u;
 const MENTOR_NAME = /Ana Petrovska|Marko Nikolov/u;
+const ROOT_PATH = /\/$/u;
+const THEME_DARK = /Theme: Dark/u;
+const THEME_LIGHT = /Theme: Light/u;
+const THEME_SYSTEM = /Theme: System/u;
 
 // Names are matched as substrings, so rank prefixes and counts don't matter.
 const mentorButton = (page: Page, name: string) =>
@@ -216,4 +221,130 @@ test('shows only theses from the last 30 days', async ({ page }) => {
   await expect(
     page.getByText('Path planning for warehouse robots'),
   ).toHaveCount(0);
+});
+
+test('changes the interface language from the Kobalte select', async ({
+  page,
+}) => {
+  await mockCatalogs(page);
+  await page.goto('/');
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+
+  await page.getByLabel('Language').click();
+  await page.getByRole('option', { name: 'Македонски' }).click();
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'mk');
+});
+
+test('changes the interface language from the keyboard', async ({ page }) => {
+  await mockCatalogs(page);
+  await page.goto('/');
+
+  await page.getByLabel('Language').focus();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('listbox')).toBeVisible();
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+
+  await expect(page.locator('html')).toHaveAttribute('lang', 'mk');
+});
+
+test('hard-loads the /mentors route', async ({ page }) => {
+  await mockCatalogs(page);
+  await page.goto('/mentors');
+
+  await expect(mentorButton(page, ANA)).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Bachelor’s theses' }),
+  ).toHaveAttribute('aria-current', 'page');
+});
+
+test('reports a missing download file with a toast', async ({ page }) => {
+  await mockCatalogs(page);
+  await page.route('**/diplomas/download/**', (route) =>
+    route.fulfill({ body: '', status: 404 }),
+  );
+  await page.goto('/');
+
+  await mentorButton(page, ANA).click();
+  await page.getByRole('button', { name: 'Download' }).first().click();
+
+  await expect(page.getByText('The file does not exist.')).toBeVisible();
+});
+
+test('keeps router history state when the query string changes', async ({
+  page,
+}) => {
+  await mockCatalogs(page);
+  await page.goto('/');
+
+  await page.getByRole('link', { name: MASTERS_TAB }).click();
+  await expect(page).toHaveURL(MASTERS_PATH);
+
+  const before = await page.evaluate(() => JSON.stringify(history.state));
+  await page.getByRole('searchbox').fill('medical');
+  const after = await page.evaluate(() => JSON.stringify(history.state));
+
+  expect(after).toBe(before);
+  await expect(page).toHaveURL(MASTERS_URL);
+
+  await page.goBack();
+  await expect(page).toHaveURL(ROOT_PATH);
+  await page.goForward();
+  await expect(page).toHaveURL(MASTERS_URL);
+});
+
+test('closes the language select on outside click', async ({ page }) => {
+  await mockCatalogs(page);
+  await page.goto('/');
+
+  await page.getByLabel('Language').click();
+  await expect(page.getByRole('listbox')).toBeVisible();
+
+  await page.getByRole('heading', { level: 1 }).click();
+  await expect(page.getByRole('listbox')).toBeHidden();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+});
+
+test('cycles the theme and updates the document', async ({ page }) => {
+  await mockCatalogs(page);
+  await page.goto('/');
+
+  await page.getByRole('button', { name: THEME_SYSTEM }).click();
+  await expect(page.getByRole('button', { name: THEME_LIGHT })).toBeVisible();
+
+  await page.getByRole('button', { name: THEME_LIGHT }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-kb-theme', 'dark');
+  await expect(page.getByRole('button', { name: THEME_DARK })).toBeVisible();
+});
+
+test('keeps DOM attribute casing and enumerated values', async ({ page }) => {
+  await mockCatalogs(page);
+  await page.goto('/');
+
+  const missingViewBox = await page.evaluate(
+    () =>
+      [...document.querySelectorAll('svg')].filter(
+        (svg) => svg.getAttribute('viewBox') === null,
+      ).length,
+  );
+
+  expect(missingViewBox).toBe(0);
+  await expect(page.getByRole('searchbox')).toHaveAttribute(
+    'spellcheck',
+    'false',
+  );
+});
+
+test('restores filter controls from a deep link', async ({ page }) => {
+  await mockCatalogs(page, { diplomas: createLongCatalog(10) });
+  await page.goto('/?status=tone%3Acancelled&year=2019');
+
+  await expect(
+    page.getByRole('button', { name: CANCELLED_CHIP }).first(),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('combobox', { name: 'Year' })).toHaveValue(
+    '2019',
+  );
 });
