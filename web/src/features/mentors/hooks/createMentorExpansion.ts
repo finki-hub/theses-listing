@@ -73,8 +73,10 @@ export const createMentorExpansion = (options: MentorExpansionOptions) => {
     () => new Set(options.filteredSummaries().map((summary) => summary.mentor)),
   );
 
-  // Derived rather than pruned in an effect: an effect that writes a source it
-  // also reads tears the frame in two flushes.
+  // Manual expansions are explicit user intent: a mentor hidden by a filter is
+  // omitted from the URL and the view, then restored when the filter stops
+  // hiding it. Pruning it permanently would require an effect that writes the
+  // source it reads, which Solid 2 rejects (`EFFECT_WRITES_OWN_SOURCE`).
   const manualExpanded = createMemo<readonly string[]>(() => {
     const requested = requestedExpanded();
     // Until the first successful load, keep URL-provided mentors so they

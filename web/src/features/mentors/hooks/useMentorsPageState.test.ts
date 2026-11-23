@@ -557,6 +557,36 @@ const defineCleanupAndRetainedSelectionTests = () => {
     expect(fetchTheses).toHaveBeenCalledTimes(2);
   });
 
+  it('restores a manual expansion when a filter stops hiding it', async () => {
+    const other = {
+      ...DIPLOMA,
+      mentor: 'Other',
+      student: 'Someone',
+      title: 'Other thesis',
+    };
+    const fetchTheses = vi.fn(() =>
+      Promise.resolve(createCatalogResult([DIPLOMA, other])),
+    );
+    const replaceState = stubBrowserLocation('?mentor=Mentor');
+    const state = createTestState(fetchTheses);
+    flush();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(state.isExpanded('Mentor')).toBe(true);
+
+    state.setSearch('Other');
+    flush();
+    await Promise.resolve();
+    expect(state.isExpanded('Mentor')).toBe(false);
+    expect(replaceState.mock.calls.at(-1)?.[2]).not.toContain('mentor=Mentor');
+
+    state.setSearch('');
+    flush();
+    await Promise.resolve();
+    expect(state.isExpanded('Mentor')).toBe(true);
+    expect(replaceState.mock.calls.at(-1)?.[2]).toContain('mentor=Mentor');
+  });
+
   it('keeps freshness metadata from the latest overlapping load', async () => {
     stubBrowserLocation('');
     const pending: Array<(result: CatalogResult) => void> = [];
