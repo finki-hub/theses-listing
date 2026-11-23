@@ -7,7 +7,7 @@ import { BREAKPOINTS, createMediaQuery } from '@/lib/media-query';
 
 import type { MentorsListProps } from './mentors-list/types';
 
-import { isCountSort } from '../types';
+import { type FilteredMentorSummary, isCountSort } from '../types';
 import MentorMobileCard from './mentors-list/MentorMobileCard';
 import MentorRow from './mentors-list/MentorRow';
 import MentorTableHeader from './mentors-list/MentorTableHeader';
@@ -37,6 +37,9 @@ const EmptyState = (props: {
   );
 };
 
+// Filtering creates new summary objects, so key by mentor to keep their rows.
+const mentorKey = (summary: FilteredMentorSummary) => summary.mentor;
+
 const MentorsList = (props: MentorsListProps) => {
   // Render only the visible layout; both used to be rendered and one hidden
   // with CSS, doubling the DOM and the highlighting work.
@@ -63,10 +66,13 @@ const MentorsList = (props: MentorsListProps) => {
               }
               when={props.filteredSummaries.length > 0}
             >
-              <For each={props.filteredSummaries}>
+              <For
+                each={props.filteredSummaries}
+                keyed={mentorKey}
+              >
                 {(summary, index) => (
                   <MentorMobileCard
-                    expanded={props.isExpanded(summary.mentor)}
+                    expanded={props.isExpanded(summary().mentor)}
                     getCountShare={props.getCountShare}
                     getFileUrl={props.getFileUrl}
                     getSearchAttemptId={props.getSearchAttemptId}
@@ -74,11 +80,11 @@ const MentorsList = (props: MentorsListProps) => {
                     hasActiveFilters={props.hasActiveFilters}
                     index={index()}
                     onToggle={() => {
-                      props.onToggle(summary.mentor);
+                      props.onToggle(summary().mentor);
                     }}
                     section={props.section}
                     showRank={isCountSort(props.sortField)}
-                    summary={summary}
+                    summary={summary()}
                   />
                 )}
               </For>
@@ -116,10 +122,13 @@ const MentorsList = (props: MentorsListProps) => {
               }
               when={props.filteredSummaries.length > 0}
             >
-              <For each={props.filteredSummaries}>
+              <For
+                each={props.filteredSummaries}
+                keyed={mentorKey}
+              >
                 {(summary, index) => (
                   <MentorRow
-                    expanded={props.isExpanded(summary.mentor)}
+                    expanded={props.isExpanded(summary().mentor)}
                     getCountShare={props.getCountShare}
                     getFileUrl={props.getFileUrl}
                     getSearchAttemptId={props.getSearchAttemptId}
@@ -127,11 +136,11 @@ const MentorsList = (props: MentorsListProps) => {
                     hasActiveFilters={props.hasActiveFilters}
                     index={index()}
                     onToggle={() => {
-                      props.onToggle(summary.mentor);
+                      props.onToggle(summary().mentor);
                     }}
                     section={props.section}
                     showRank={isCountSort(props.sortField)}
-                    summary={summary}
+                    summary={summary()}
                   />
                 )}
               </For>
