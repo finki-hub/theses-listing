@@ -1,3 +1,4 @@
+import { ChevronDown } from '@lucide/solid';
 import { type ComponentProps } from '@solidjs/web';
 import { omit } from 'solid-js';
 
@@ -25,9 +26,20 @@ export const NativeSelect = (props: NativeSelectProps) => {
   const rest = omit(props, 'class');
 
   return (
-    <select
-      class={cn(controlClass, 'cursor-pointer pr-2', props.class)}
-      {...rest}
-    />
+    // A drawn arrow: browsers place the native one ignoring the padding.
+    <span class="relative block">
+      <select
+        class={cn(
+          controlClass,
+          'cursor-pointer appearance-none truncate pr-8',
+          props.class,
+        )}
+        {...rest}
+      />
+      <ChevronDown
+        aria-hidden="true"
+        class="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+      />
+    </span>
   );
 };
