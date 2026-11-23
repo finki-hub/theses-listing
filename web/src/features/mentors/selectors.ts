@@ -22,7 +22,7 @@ const collator = new Intl.Collator();
 // analytics with the detailed status filter.
 export const TONE_FILTER_PREFIX = 'tone:';
 
-export const FILTERABLE_TONES = ['progress', 'complete', 'cancelled'] as const;
+export const FILTERABLE_TONES = ['progress', 'complete'] as const;
 
 export const toneFilterValue = (tone: StatusTone) =>
   `${TONE_FILTER_PREFIX}${tone}`;

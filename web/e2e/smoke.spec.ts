@@ -11,7 +11,8 @@ const MASTERS_TAB = 'Master’s theses';
 const EXPANDED_MENTOR_URL = /mentor=Ana\+Petrovska/u;
 const SEARCH_URL = /q=lossless/u;
 const CANCELLED_CHIP = /Cancelled/u;
-const CANCELLED_URL = /status=tone%3Acancelled/u;
+const COMPLETED_CHIP = /Completed/u;
+const COMPLETED_URL = /status=tone%3Acomplete/u;
 const MASTERS_PATH = /\/masters$/u;
 const MASTERS_URL = /\/masters\?q=medical/u;
 const YEAR_URL = /year=2019/u;
@@ -85,18 +86,22 @@ test('filters by state and clears the filters', async ({ page }) => {
   await mockCatalogs(page);
   await page.goto('/');
 
-  const cancelled = page.getByRole('button', { name: CANCELLED_CHIP });
-  await cancelled.click();
+  await expect(page.getByRole('button', { name: CANCELLED_CHIP })).toHaveCount(
+    0,
+  );
 
-  await expect(cancelled).toHaveAttribute('aria-pressed', 'true');
-  await expect(page).toHaveURL(CANCELLED_URL);
-  await expect(mentorButton(page, MARKO)).toBeVisible();
-  await expect(mentorButton(page, ANA)).toHaveCount(0);
+  const completed = page.getByRole('button', { name: COMPLETED_CHIP });
+  await completed.click();
+
+  await expect(completed).toHaveAttribute('aria-pressed', 'true');
+  await expect(page).toHaveURL(COMPLETED_URL);
+  await expect(mentorButton(page, ANA)).toBeVisible();
+  await expect(mentorButton(page, MARKO)).toHaveCount(0);
 
   await page.getByRole('button', { name: 'Clear filters' }).first().click();
 
-  await expect(cancelled).toHaveAttribute('aria-pressed', 'false');
-  await expect(mentorButton(page, ANA)).toBeVisible();
+  await expect(completed).toHaveAttribute('aria-pressed', 'false');
+  await expect(mentorButton(page, MARKO)).toBeVisible();
 });
 
 test('switches to master’s theses and keeps the search', async ({ page }) => {
@@ -341,10 +346,10 @@ test('keeps DOM attribute casing and enumerated values', async ({ page }) => {
 
 test('restores filter controls from a deep link', async ({ page }) => {
   await mockCatalogs(page, { diplomas: createLongCatalog(10) });
-  await page.goto('/?status=tone%3Acancelled&year=2019');
+  await page.goto('/?status=tone%3Acomplete&year=2019');
 
   await expect(
-    page.getByRole('button', { name: CANCELLED_CHIP }).first(),
+    page.getByRole('button', { name: COMPLETED_CHIP }).first(),
   ).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('combobox', { name: 'Year' })).toHaveValue(
     '2019',

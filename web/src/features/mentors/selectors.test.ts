@@ -76,7 +76,6 @@ describe('state filter', () => {
 
   it('filters by state and counts each state', () => {
     expect(titles(toneFilterValue('complete'))).toEqual(['Одбранет']);
-    expect(titles(toneFilterValue('cancelled'))).toEqual(['Откажан']);
     expect(countByTone(filter(''), getStatusTone)).toEqual({
       cancelled: 1,
       complete: 1,
@@ -87,6 +86,7 @@ describe('state filter', () => {
 
   it('only accepts known states', () => {
     expect(parseToneFilter('tone:progress')).toBe('progress');
+    expect(parseToneFilter('tone:cancelled')).toBeNull();
     expect(parseToneFilter('tone:unknown')).toBeNull();
     expect(parseToneFilter('Пријава')).toBeNull();
   });
