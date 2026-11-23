@@ -10,6 +10,10 @@ type LanguageSelectProps = {
   readonly setLanguage: (language: Language) => void;
 };
 
+// Opening already focuses the selected option; Kobalte's later auto-focus would
+// undo an arrow key pressed right after opening. Its types omit this option.
+const listboxFocusProps = { autoFocus: false };
+
 export const LanguageSelect = (props: LanguageSelectProps) => {
   const id = createUniqueId();
   const languages = Object.keys(languageNames).filter(isLanguage);
@@ -104,7 +108,10 @@ export const LanguageSelect = (props: LanguageSelectProps) => {
           >
             {props.label}
           </div>
-          <Select.Listbox class="max-h-(--kb-popper-content-available-height) overflow-y-auto p-1 outline-none" />
+          <Select.Listbox
+            {...listboxFocusProps}
+            class="max-h-(--kb-popper-content-available-height) overflow-y-auto p-1 outline-none"
+          />
         </Select.Content>
       </Select.Portal>
     </Select>
