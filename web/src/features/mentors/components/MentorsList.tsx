@@ -1,3 +1,4 @@
+import { dynamic, type JSX } from '@solidjs/web';
 import { For, Show } from 'solid-js';
 
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,10 @@ import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table';
 import { useLanguage } from '@/lib/LanguageProvider';
 import { BREAKPOINTS, createMediaQuery } from '@/lib/media-query';
 
-import type { MentorsListProps } from './mentors-list/types';
+import type {
+  MentorListItemProps,
+  MentorsListProps,
+} from './mentors-list/types';
 
 import { type FilteredMentorSummary, isCountSort } from '../types';
 import MentorMobileCard from './mentors-list/MentorMobileCard';
@@ -40,6 +44,38 @@ const EmptyState = (props: {
 // Filtering creates new summary objects, so key by mentor to keep their rows.
 const mentorKey = (summary: FilteredMentorSummary) => summary.mentor;
 
+const MentorItems = (
+  props: MentorsListProps & {
+    item: (itemProps: MentorListItemProps) => JSX.Element;
+  },
+) => {
+  const Item = dynamic(() => props.item);
+  return (
+    <For
+      each={props.filteredSummaries}
+      keyed={mentorKey}
+    >
+      {(summary, index) => (
+        <Item
+          expanded={props.isExpanded(summary().mentor)}
+          getCountShare={props.getCountShare}
+          getFileUrl={props.getFileUrl}
+          getSearchAttemptId={props.getSearchAttemptId}
+          getStatusInfo={props.getStatusInfo}
+          hasActiveFilters={props.hasActiveFilters}
+          index={index()}
+          onToggle={() => {
+            props.onToggle(summary().mentor);
+          }}
+          section={props.section}
+          showRank={isCountSort(props.sortField)}
+          summary={summary()}
+        />
+      )}
+    </For>
+  );
+};
+
 const MentorsList = (props: MentorsListProps) => {
   // Render only the visible layout; both used to be rendered and one hidden
   // with CSS, doubling the DOM and the highlighting work.
@@ -66,28 +102,10 @@ const MentorsList = (props: MentorsListProps) => {
               }
               when={props.filteredSummaries.length > 0}
             >
-              <For
-                each={props.filteredSummaries}
-                keyed={mentorKey}
-              >
-                {(summary, index) => (
-                  <MentorMobileCard
-                    expanded={props.isExpanded(summary().mentor)}
-                    getCountShare={props.getCountShare}
-                    getFileUrl={props.getFileUrl}
-                    getSearchAttemptId={props.getSearchAttemptId}
-                    getStatusInfo={props.getStatusInfo}
-                    hasActiveFilters={props.hasActiveFilters}
-                    index={index()}
-                    onToggle={() => {
-                      props.onToggle(summary().mentor);
-                    }}
-                    section={props.section}
-                    showRank={isCountSort(props.sortField)}
-                    summary={summary()}
-                  />
-                )}
-              </For>
+              <MentorItems
+                {...props}
+                item={MentorMobileCard}
+              />
             </Show>
           </div>
         </>
@@ -122,28 +140,10 @@ const MentorsList = (props: MentorsListProps) => {
               }
               when={props.filteredSummaries.length > 0}
             >
-              <For
-                each={props.filteredSummaries}
-                keyed={mentorKey}
-              >
-                {(summary, index) => (
-                  <MentorRow
-                    expanded={props.isExpanded(summary().mentor)}
-                    getCountShare={props.getCountShare}
-                    getFileUrl={props.getFileUrl}
-                    getSearchAttemptId={props.getSearchAttemptId}
-                    getStatusInfo={props.getStatusInfo}
-                    hasActiveFilters={props.hasActiveFilters}
-                    index={index()}
-                    onToggle={() => {
-                      props.onToggle(summary().mentor);
-                    }}
-                    section={props.section}
-                    showRank={isCountSort(props.sortField)}
-                    summary={summary()}
-                  />
-                )}
-              </For>
+              <MentorItems
+                {...props}
+                item={MentorRow}
+              />
             </Show>
           </TableBody>
         </Table>
