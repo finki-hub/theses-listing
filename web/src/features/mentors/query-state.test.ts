@@ -16,3 +16,13 @@ describe('sort from the URL', () => {
     expect(state.sortDirection).toBe(direction);
   });
 });
+
+describe('status from the URL', () => {
+  it.each([
+    ['?status=tone%3Acomplete', 'tone:complete'],
+    ['?status=tone%3Acancelled', ''],
+    ['?status=Пријава', 'Пријава'],
+  ])('%s filters by "%s"', (search, status) => {
+    expect(getInitialMentorsPageState(search).statusFilter).toBe(status);
+  });
+});

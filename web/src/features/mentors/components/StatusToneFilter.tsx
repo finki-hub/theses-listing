@@ -25,7 +25,7 @@ export const toneDotClasses: Record<StatusTone, string> = {
   unknown: 'bg-muted-foreground',
 };
 
-// Phones: a 3-column segmented control with the count under the label, so
+// Phones: a 2-column segmented control with the count under the label, so
 // all states fit on one row in every language. sm and up: inline pills.
 const chipClass =
   'flex min-w-0 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-lg border px-1.5 py-1.5 text-xs leading-tight ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:h-8 sm:flex-row sm:gap-1.5 sm:rounded-full sm:px-3 sm:py-0 sm:text-sm';
@@ -42,7 +42,7 @@ const StatusToneFilter = (props: StatusToneFilterProps) => {
   });
 
   return (
-    <fieldset class="m-0 grid min-w-0 grid-cols-3 gap-1.5 border-0 p-0 sm:flex sm:flex-wrap sm:gap-2">
+    <fieldset class="m-0 grid min-w-0 grid-cols-2 gap-1.5 border-0 p-0 sm:flex sm:flex-wrap sm:gap-2">
       <legend class="sr-only">{t().statusState}</legend>
       <For each={FILTERABLE_TONES}>
         {(tone) => {

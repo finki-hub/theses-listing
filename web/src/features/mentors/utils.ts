@@ -192,7 +192,22 @@ export const normalizeSearchText = (value: string) =>
     .trim()
     .replaceAll(/\s+/gu, ' ');
 
+// Catalog text repeats on every keystroke; the limit only guards memory.
+const NORMALIZED_CACHE_LIMIT = 50_000;
+const normalizedCache = new Map<string, string>();
+
+const normalizeCatalogText = (value: string) => {
+  const cached = normalizedCache.get(value);
+  if (cached !== undefined) return cached;
+
+  if (normalizedCache.size >= NORMALIZED_CACHE_LIMIT) normalizedCache.clear();
+  const normalized = normalizeSearchText(value);
+  normalizedCache.set(value, normalized);
+  return normalized;
+};
+
 export const matchesNormalizedSearch = (
   value: string,
   normalizedSearch: string,
-) => !normalizedSearch || normalizeSearchText(value).includes(normalizedSearch);
+) =>
+  !normalizedSearch || normalizeCatalogText(value).includes(normalizedSearch);

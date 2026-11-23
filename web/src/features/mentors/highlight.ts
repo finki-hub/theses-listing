@@ -1,4 +1,4 @@
-import { normalizeSearchText } from './utils';
+import { matchesNormalizedSearch, normalizeSearchText } from './utils';
 
 export type HighlightRange = readonly [start: number, end: number];
 
@@ -46,7 +46,7 @@ export const findHighlightRanges = (
   // itself considers a match.
   if (
     normalizedQuery.length === 0 ||
-    !normalizeSearchText(text).includes(normalizedQuery)
+    !matchesNormalizedSearch(text, normalizedQuery)
   ) {
     return [];
   }

@@ -1,3 +1,4 @@
+import { parseToneFilter, TONE_FILTER_PREFIX } from './selectors';
 import {
   type InitialMentorsPageState,
   isCountSort,
@@ -45,7 +46,13 @@ export const getInitialMentorsPageState = (
     ),
   ];
   const search = params.get('q')?.trim();
-  const statusFilter = params.get('status')?.trim();
+  const statusParam = params.get('status')?.trim() ?? '';
+  // Old links may name a state that is no longer offered; show everything.
+  const statusFilter =
+    statusParam.startsWith(TONE_FILTER_PREFIX) &&
+    parseToneFilter(statusParam) === null
+      ? ''
+      : statusParam;
   const yearFilter = params.get('year')?.trim();
 
   return {
@@ -53,7 +60,7 @@ export const getInitialMentorsPageState = (
     search: search ?? '',
     sortDirection: nextSortDirection,
     sortField: nextSortField,
-    statusFilter: statusFilter ?? '',
+    statusFilter,
     yearFilter: yearFilter ?? '',
   };
 };
