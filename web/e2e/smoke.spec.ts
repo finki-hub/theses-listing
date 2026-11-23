@@ -376,6 +376,7 @@ test('keeps in-progress dots and values aligned', async ({
     diplomas: [
       ...progressTheses('Mentor Six', 6),
       ...progressTheses('Mentor Fifteen', 15),
+      ...progressTheses('Mentor Hundred', 100),
     ],
   });
   await page.goto('/');
@@ -387,17 +388,20 @@ test('keeps in-progress dots and values aligned', async ({
     return { dotX: dot?.x ?? NaN, valueX: value?.x ?? NaN };
   };
 
-  const [six, fifteen] = await Promise.all([
+  const [six, fifteen, hundred] = await Promise.all([
     positions('Mentor Six'),
     positions('Mentor Fifteen'),
+    positions('Mentor Hundred'),
   ]);
 
-  for (const position of [six, fifteen]) {
+  for (const position of [six, fifteen, hundred]) {
     expect(Number.isFinite(position.dotX)).toBe(true);
     expect(Number.isFinite(position.valueX)).toBe(true);
   }
 
-  expect(Math.abs(six.dotX - fifteen.dotX)).toBeLessThan(1);
-  expect(Math.abs(six.valueX - fifteen.valueX)).toBeLessThan(1);
+  for (const other of [fifteen, hundred]) {
+    expect(Math.abs(six.dotX - other.dotX)).toBeLessThan(1);
+    expect(Math.abs(six.valueX - other.valueX)).toBeLessThan(1);
+  }
 });
 /* eslint-enable sonarjs/no-skipped-tests -- Re-enable after the desktop-only test. */
