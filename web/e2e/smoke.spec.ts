@@ -133,7 +133,7 @@ test('shows the per-year chart for master’s theses', async ({ page }) => {
   if (!thesis) throw new Error('Missing master’s fixture');
   await mockCatalogs(page, {
     masters: [
-      thesis,
+      { ...thesis, dateOfPresentation: '11.11.2026' },
       { ...thesis, dateOfPresentation: '20.06.2025', student: 'Earlier' },
       { ...thesis, dateOfPresentation: '', student: 'Undated' },
     ],
