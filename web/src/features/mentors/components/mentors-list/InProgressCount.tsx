@@ -27,12 +27,20 @@ const InProgressCount = (props: { count: number; withLabel?: boolean }) => {
           toneDotClasses.progress,
           props.count === 0 && 'opacity-40',
         )}
+        data-testid="in-progress-dot"
       />
       <Show
         fallback={
-          // Fixed two-digit track keeps the dot on one vertical line across
-          // rows while the digits stay right-aligned under the header.
-          <span class="min-w-[2ch] text-right">{value()}</span>
+          // Fixed two-digit track, left-start: every count begins right after
+          // the dot + gap, so digits share a left edge and the dot stays on
+          // one vertical line. A rare 3-digit count overflows visibly into
+          // the cell padding without moving the dot or the digits' start.
+          <span
+            class="w-[2ch] text-left"
+            data-testid="in-progress-value"
+          >
+            {value()}
+          </span>
         }
         when={props.withLabel}
       >

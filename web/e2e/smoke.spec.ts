@@ -365,7 +365,7 @@ const progressTheses = (mentor: string, count: number): Diploma[] =>
   }));
 
 /* eslint-disable sonarjs/no-skipped-tests -- Desktop-only alignment assertion; the mobile card uses the labeled variant. */
-test('aligns the in-progress dots across digit counts', async ({
+test('keeps in-progress dots and values aligned', async ({
   isMobile,
   page,
 }) => {
@@ -376,35 +376,32 @@ test('aligns the in-progress dots across digit counts', async ({
     diplomas: [
       ...progressTheses('Mentor Six', 6),
       ...progressTheses('Mentor Fifteen', 15),
+      ...progressTheses('Mentor Hundred', 100),
     ],
   });
   await page.goto('/');
 
-  const inProgressColumn = await page
-    .getByRole('columnheader')
-    .evaluateAll((headers) =>
-      headers.findIndex((header) => header.textContent.includes('In progress')),
-    );
-  expect(inProgressColumn).toBeGreaterThanOrEqual(0);
-
-  const dotX = async (mentor: string) => {
+  const positions = async (mentor: string) => {
     const row = page.getByRole('row').filter({ hasText: mentor });
-    const box = await row
-      .getByRole('cell')
-      .nth(inProgressColumn)
-      .locator('[aria-hidden="true"]')
-      .first()
-      .boundingBox();
-    return box?.x ?? NaN;
+    const dot = await row.getByTestId('in-progress-dot').boundingBox();
+    const value = await row.getByTestId('in-progress-value').boundingBox();
+    return { dotX: dot?.x ?? NaN, valueX: value?.x ?? NaN };
   };
 
-  const [six, fifteen] = await Promise.all([
-    dotX('Mentor Six'),
-    dotX('Mentor Fifteen'),
+  const [six, fifteen, hundred] = await Promise.all([
+    positions('Mentor Six'),
+    positions('Mentor Fifteen'),
+    positions('Mentor Hundred'),
   ]);
 
-  expect(Number.isFinite(six)).toBe(true);
-  expect(Number.isFinite(fifteen)).toBe(true);
-  expect(Math.abs(six - fifteen)).toBeLessThan(1);
+  for (const position of [six, fifteen, hundred]) {
+    expect(Number.isFinite(position.dotX)).toBe(true);
+    expect(Number.isFinite(position.valueX)).toBe(true);
+  }
+
+  for (const other of [fifteen, hundred]) {
+    expect(Math.abs(six.dotX - other.dotX)).toBeLessThan(1);
+    expect(Math.abs(six.valueX - other.valueX)).toBeLessThan(1);
+  }
 });
 /* eslint-enable sonarjs/no-skipped-tests -- Re-enable after the desktop-only test. */
