@@ -30,9 +30,9 @@ const InProgressCount = (props: { count: number; withLabel?: boolean }) => {
       />
       <Show
         fallback={
-          // Fixed numeric track keeps the dot on one vertical line across
+          // Fixed two-digit track keeps the dot on one vertical line across
           // rows while the digits stay right-aligned under the header.
-          <span class="min-w-5 text-right">{value()}</span>
+          <span class="min-w-[2ch] text-right">{value()}</span>
         }
         when={props.withLabel}
       >

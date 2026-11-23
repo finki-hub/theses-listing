@@ -380,11 +380,18 @@ test('aligns the in-progress dots across digit counts', async ({
   });
   await page.goto('/');
 
+  const inProgressColumn = await page
+    .getByRole('columnheader')
+    .evaluateAll((headers) =>
+      headers.findIndex((header) => header.textContent.includes('In progress')),
+    );
+  expect(inProgressColumn).toBeGreaterThanOrEqual(0);
+
   const dotX = async (mentor: string) => {
     const row = page.getByRole('row').filter({ hasText: mentor });
     const box = await row
-      .locator('td.text-right')
-      .first()
+      .getByRole('cell')
+      .nth(inProgressColumn)
       .locator('[aria-hidden="true"]')
       .first()
       .boundingBox();
