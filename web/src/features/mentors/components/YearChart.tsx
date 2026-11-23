@@ -25,8 +25,8 @@ type YearChartProps = {
 
 const STORAGE_KEY = 'finki-hub-year-chart';
 const TONES: StatusTone[] = ['complete', 'progress', 'cancelled'];
-// Below this many years a chart says less than the year dropdown does.
-const MIN_YEARS = 3;
+// A single bar has nothing to compare; the master's catalog spans two years.
+const MIN_YEARS = 2;
 
 // The current year, read without constructing a Date.
 const currentYear = new Intl.DateTimeFormat('en', { year: 'numeric' }).format();

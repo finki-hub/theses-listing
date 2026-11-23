@@ -85,9 +85,14 @@ export const createLongCatalog = (mentors: number): Diploma[] =>
 
 export const mockCatalogs = async (
   page: Page,
-  options: { diplomas?: Diploma[]; failDiplomasOnce?: boolean } = {},
+  options: {
+    diplomas?: Diploma[];
+    failDiplomasOnce?: boolean;
+    masters?: typeof masters;
+  } = {},
 ) => {
   const diplomaCatalog = options.diplomas ?? diplomas;
+  const masterCatalog = options.masters ?? masters;
   let diplomaFailures = options.failDiplomasOnce ? 1 : 0;
 
   await page.route(DIPLOMAS_LIST_URL, async (route) => {
@@ -103,7 +108,7 @@ export const mockCatalogs = async (
     await route.fulfill(jsonResponse(diplomaCatalog));
   });
   await page.route(MASTERS_LIST_URL, async (route) => {
-    await route.fulfill(jsonResponse(masters));
+    await route.fulfill(jsonResponse(masterCatalog));
   });
 };
 

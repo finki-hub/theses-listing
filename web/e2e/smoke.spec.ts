@@ -2,7 +2,12 @@ import { expect, type Page, test } from '@playwright/test';
 
 import type { Diploma } from '../src/types';
 
-import { createLongCatalog, mockCatalogs, useEnglish } from './fixtures';
+import {
+  createLongCatalog,
+  masters,
+  mockCatalogs,
+  useEnglish,
+} from './fixtures';
 
 const ANA = 'Ana Petrovska';
 const MARKO = 'Marko Nikolov';
@@ -15,6 +20,7 @@ const COMPLETED_CHIP = /Completed/u;
 const COMPLETED_URL = /status=tone%3Acomplete/u;
 const MASTERS_PATH = /\/masters$/u;
 const MASTERS_URL = /\/masters\?q=medical/u;
+const MASTERS_YEAR_URL = /\/masters\?year=2025/u;
 const YEAR_URL = /year=2019/u;
 const IN_PROGRESS_URL = /sort=inProgress/u;
 const RECENT_URL = /year=recent/u;
@@ -120,6 +126,28 @@ test('switches to master’s theses and keeps the search', async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText('Step 13 of 24').first()).toBeVisible();
   await expectNoHorizontalScroll(page);
+});
+
+test('shows the per-year chart for master’s theses', async ({ page }) => {
+  const thesis = masters[0];
+  if (!thesis) throw new Error('Missing master’s fixture');
+  await mockCatalogs(page, {
+    masters: [
+      thesis,
+      { ...thesis, dateOfPresentation: '20.06.2025', student: 'Earlier' },
+      { ...thesis, dateOfPresentation: '', student: 'Undated' },
+    ],
+  });
+  await page.goto('/masters');
+
+  const chart = page.getByRole('button', { name: 'Theses per year' });
+  await expect(chart).toBeVisible();
+  if ((await chart.getAttribute('aria-expanded')) === 'false') {
+    await chart.click();
+  }
+
+  await page.getByRole('button', { exact: true, name: '2025: 1' }).click();
+  await expect(page).toHaveURL(MASTERS_YEAR_URL);
 });
 
 test('recovers from a failed load with Try again', async ({ page }) => {
