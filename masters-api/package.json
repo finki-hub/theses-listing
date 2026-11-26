@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "finki-auth": "^3.0.0",
-    "hono": "^4.13.20",
+    "hono": "^4.13.21",
     "theses-listing-shared": "0.0.0"
   },
   "devDependencies": {
